@@ -7,13 +7,18 @@ from getpass import getuser
 from l2l.utils.environment import Environment
 
 from l2l.logging_tools import create_shared_logger_data, configure_loggers
-from l2l.optimizees.comet.optimizee import CometSyntheticOptimizee, \
-    CometSyntheticOptimizeeParameters
+# from l2l.optimizees.comet.optimizee import CometSyntheticOptimizee, \
+#     CometSyntheticOptimizeeParameters
+from l2l.optimizees.comet.optimizee_synthetic import \
+    CometSyntheticOptimizee as Optimizee
+from l2l.optimizees.comet.optimizee_experimental import \
+    CometsyntheticOptimizeeParameters as OptimizeeParameters
 from l2l.optimizers.evolution import GeneticAlgorithmOptimizer,\
     GeneticAlgorithmParameters
 from l2l.paths import Paths
 import l2l.utils.JUBE_runner as jube
 
+from run_params import optimizee_params, optimizer_params
 from comet.models.brunel.model_params import net_dict, bounds_dict
 from comet.models.brunel.brunel_model import brunel_model
 from comet.evaluation.joint_test import joint_test
@@ -110,36 +115,53 @@ def run_experiment():
     traj.f_add_parameter_to_group("JUBE_params", "paths_obj", paths)
 
     # Optimizee params
-    optimizee_seed = 123
+    # optimizee_seed = 123
     # Keys to evolve
     # TODO: Find out if one key can refer to an entire array
-    keys = ['P_EE', 'P_EI', 'P_IE', 'P_II']
-    optimizee_parameters = CometSyntheticOptimizeeParameters(
-        seed=optimizee_seed,
-        keys_to_evolve=keys,
+    # keys = ['P_EE', 'P_EI', 'P_IE', 'P_II']
+    # optimizee_parameters = CometSyntheticOptimizeeParameters(
+    #     seed=optimizee_seed,
+    #     keys_to_evolve=keys,
+    #     default_params_dict=net_dict,
+    #     default_bounds_dict=bounds_dict,
+    #     model_class=brunel_model,
+    #     test_class=joint_test)
+    optimizee_parameters = OptimizeeParameters(
+        seed=optimizee_params['seed'],
+        keys_to_evolve=optimizee_params['keys_to_evolve'],
         default_params_dict=net_dict,
         default_bounds_dict=bounds_dict,
         model_class=brunel_model,
         test_class=joint_test)
     # Inner-loop simulator
-    optimizee = CometSyntheticOptimizee(traj, optimizee_parameters)
+    optimizee = Optimizee(traj, optimizee_parameters)
     jube.prepare_optimizee(optimizee, paths.root_dir_path)
 
     logger.info("Optimizee parameters: %s", optimizee_parameters)
 
     # Outer-loop optimizer initialization
-    optimizer_seed = 123
-    pop_size = 24
-    optimizer_parameters = GeneticAlgorithmParameters(popsize=pop_size,
-                                                      seed=optimizer_seed,
-                                                      CXPB=0.8,
-                                                      MUTPB=0.002,
-                                                      NGEN=50,
-                                                      indpb=0.2,
-                                                      tournsize=3,
-                                                      matepar=0.5,
-                                                      mutpar=0.05
-                                                      )
+    # optimizer_seed = 123
+    # pop_size = 24
+    # optimizer_parameters = GeneticAlgorithmParameters(popsize=pop_size,
+    #                                                   seed=optimizer_seed,
+    #                                                   CXPB=0.8,
+    #                                                   MUTPB=0.002,
+    #                                                   NGEN=50,
+    #                                                   indpb=0.2,
+    #                                                   tournsize=3,
+    #                                                   matepar=0.5,
+    #                                                   mutpar=0.05
+    #                                                   )
+    optimizer_parameters = GeneticAlgorithmParameters(
+        popsize=optimizer_params['popsize'],
+        seed=optimizer_params['seed'],
+        CXPB=optimizer_params['CXPB'],
+        MUTPB=optimizer_params['MUTPB'],
+        NGEN=optimizer_params['NGEN'],
+        indpb=optimizer_params['indpb'],
+        tournsize=optimizer_params['tournsize'],
+        matepar=optimizer_params['matepar'],
+        mutpar=optimizer_params['mutpar'])
     logger.info("Optimizer parameters: %s", optimizer_parameters)
 
     optimizer = GeneticAlgorithmOptimizer(traj,
