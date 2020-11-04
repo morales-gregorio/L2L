@@ -7,8 +7,8 @@ import os
 from os.path import join, isdir, dirname, isfile
 from l2l.optimizees.optimizee import Optimizee
 
-CometExperimentalOptimizeeParameters = \
-    namedtuple('CometExperimentalOptimizeeParameters',
+CometOptimizeeParameters = \
+    namedtuple('CometOptimizeeParameters',
                ['seed',
                 'keys_to_evolve',
                 'default_params_dict',
@@ -18,7 +18,7 @@ CometExperimentalOptimizeeParameters = \
                 'test_class'])
 
 
-class CometExperimentalOptimizee(Optimizee):
+class CometOptimizee(Optimizee):
     """
     Implements a simple function optimizee.
     Functions are generated using the FunctionGenerator.
@@ -45,7 +45,6 @@ class CometExperimentalOptimizee(Optimizee):
             self.bounds_dict[k] = parameters.default_bounds_dict[k]
 
         self.model_class = parameters.model_class
-        self.experiment_class = parameters.experiment_class
         self.test_class = parameters.test_class
 
     def create_individual(self):
@@ -131,30 +130,28 @@ class CometExperimentalOptimizee(Optimizee):
         # * Defines which distance metric will be used to calculate the scores
         test = self.test_class()
 
-        # # TODO: Use experimental data here!
-        # # If default predictions exists load them instead of re-calculating
-        # modulefile = sys.modules[self.model_class.__module__].__file__
-        # target_pred_path = join(dirname(modulefile),
-        #                         'predictions', 'default.csv')
-
-        # if isfile(target_pred_path):
-        #     target_prediction = pd.read_csv(target_pred_path).to_numpy().T
-        #     test.set_prediction(model=target, prediction=target_prediction)
-        #     print('Precalculated default model predictions stored in: ',
-        #           'memory ' if target._backend.use_memory_cache else '',
-        #           'disk' if target._backend.use_disk_cache else '')
-        # else:
-        #     # Target predictions do not exist, therefore they are calculated
-        #     # Should only happen once in the whole execution (if at all)
-        #     print('(Re-)calculating the default model predictions.')
-        #     target_prediction = test.generate_prediction(target)
-        #     df = pd.DataFrame(data=target_prediction.T,
-        #                       columns=[t.name for t in test.test_list],
-        #                       index=np.arange(target_prediction.shape[1]))
-        #     # Store calculated predictions for the default model
-        #     if not isdir(dirname(target_pred_path)):
-        #         os.mkdir(dirname(target_pred_path))
-        #     df.to_csv(target_pred_path, index=False)
+        # If default predictions exists load them instead of re-calculating
+        modulefile = sys.modules[self.model_class.__module__].__file__
+        target_pred_path = join(dirname(modulefile),
+                                'predictions', 'default.csv')
+        if isfile(target_pred_path):
+            target_prediction = pd.read_csv(target_pred_path).to_numpy().T
+            test.set_prediction(model=target, prediction=target_prediction)
+            print('Precalculated default model predictions stored in: ',
+                  'memory ' if target._backend.use_memory_cache else '',
+                  'disk' if target._backend.use_disk_cache else '')
+        else:
+            # Target predictions do not exist, therefore they are calculated
+            # Should only happen once in the whole execution (if at all)
+            print('(Re-)calculating the default model predictions.')
+            target_prediction = test.generate_prediction(target)
+            df = pd.DataFrame(data=target_prediction.T,
+                              columns=[t.name for t in test.test_list],
+                              index=np.arange(target_prediction.shape[1]))
+            # Store calculated predictions for the default model
+            if not isdir(dirname(target_pred_path)):
+                os.mkdir(dirname(target_pred_path))
+            df.to_csv(target_pred_path, index=False)
 
         # Run test:
         # * This will run the simulation (for the observation model)
