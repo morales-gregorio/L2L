@@ -1,4 +1,7 @@
 # parameters for the l2l-comet-[..]-ga.py script
+# MICROCIRCUIT MODEL
+
+# TODO update the keys to evolve !
 
 # Optimizee params
 optimizee_params = {
