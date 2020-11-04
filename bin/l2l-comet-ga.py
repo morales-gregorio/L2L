@@ -99,7 +99,10 @@ def run_experiment(args):
     traj.f_add_parameter_to_group("JUBE_params", "exec",
                                   "srun -n 1 -c 8 --exclusive python " +
                                   os.path.join(paths.root_dir_path,
-                                               "run_files/run_optimizee.py"))
+                                               "run-num-test",
+                                               "simulation",
+                                               "run_files",
+                                               "run_optimizee.py"))
     # Ready file for a generation
     traj.f_add_parameter_to_group("JUBE_params", "ready_file",
                                   os.path.join(paths.root_dir_path,
