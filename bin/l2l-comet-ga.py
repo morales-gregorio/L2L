@@ -39,7 +39,7 @@ def run_experiment(args):
             elif args.noise_type == 'pink':
                 raise NotImplementedError('To be implemented')
 
-    # Resolve mode arg:
+    # Resolve mode arg
     if args.mode == 'syn':
         exp_model = None
     elif args.mode == 'exp':
