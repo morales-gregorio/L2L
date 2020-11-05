@@ -37,6 +37,7 @@ class CometOptimizee(Optimizee):
     def __init__(self, traj, parameters):
         super().__init__(traj)
 
+        self.seed = parameters.seed
         self.keys_to_evolve = parameters.keys_to_evolve
         self.default_dict = dict()
         self.bounds_dict = dict()
@@ -110,20 +111,31 @@ class CometOptimizee(Optimizee):
         :return: a single element :obj:`tuple` containing the value of
         the chosen function
         """
-        # Prevent huge ammounts of warnings from being raised
+        # Prevent huge ammounts of expected warnings from being raised
         warnings.simplefilter("ignore", category=RuntimeWarning)
         warnings.simplefilter("ignore", category=FutureWarning)
         warnings.simplefilter("ignore", category=UserWarning)
 
-        # Initialize two brunel models
+        # Initialize target model
+        if self.experiment_class is None:
+            # Test against synthetic data
+            target = self.model_class(name='Synthetic target',
+                                      run_params={'seed': self.seed})
+        else:
+            # Test against experimental data
+            # TODO make this line area sensitive
+            raise NotImplementedError('Work in progress')
+            target = self.experiment_class(name='Experimental target')
+
+        # Initialize observation model
         # The dictionary `model_params` can be used to set some model params
         # The defaul parameters are at comet.models.brunel.model_params
-        target = self.model_class(name='Target')
         new_params = {}
         for k in traj.individual.params.keys():
             new_params[k.split('individual.')[-1]] = traj.individual.params[k]
         observation = self.model_class(name='Optimizee',
-                                       model_params=new_params)
+                                       model_params=new_params,
+                                       run_params={'seed': self.seed})
 
         # Initialize the joint test:
         # * Defines which statistics are calculated
