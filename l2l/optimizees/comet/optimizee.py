@@ -58,7 +58,7 @@ class CometOptimizee(Optimizee):
         """
         parameter_dict = {}
         for k in self.keys_to_evolve:
-            n = np.size(self.default_dict[k])
+            n = np.array(self.default_dict[k]).shape
             minval = self.bounds_dict[k]['min']
             maxval = self.bounds_dict[k]['max']
             parameter_dict[k] = np.random.uniform(minval, maxval, size=n)
