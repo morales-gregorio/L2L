@@ -18,8 +18,9 @@ def run_experiment(args):
                                     datetime.now().strftime("%Y-%m-%d-%H_%M"))
     trajectory_name = 'comet'
     jube_params = {"exec": "srun -N 1 -n 1 -c 8 python"}
-    traj, params = experiment.prepare_experiment(trajectory_name=trajectory_name,
-                                                 jube_parameter=jube_params, name=name)
+    traj, params = experiment.prepare_experiment(
+        trajectory_name=trajectory_name,
+        jube_parameter=jube_params, name=name)
 
     # Resolve model and noise sources from input arguments
     if args.model == 'brunel':
@@ -30,14 +31,14 @@ def run_experiment(args):
             from comet.models.brunel.brunel_model import brunel_model as sim_model
         elif args.noise_type == 'pink':
             raise NotImplementedError('No pink noise for brunel model')
-        elif args.model == 'microcircuit':
-            if args.noise_type == 'poisson':
-                from comet_microcircuit_hyperparams import optimizee_params
-                from comet_microcircuit_hyperparams import optimizer_params
-                from comet.models.microcircuit.model_params import net_dict, bounds_dict
-                from comet.models.microcircuit.microcircuit_model import microcircuit_model as sim_model
-            elif args.noise_type == 'pink':
-                raise NotImplementedError('To be implemented')
+    elif args.model == 'microcircuit':
+        if args.noise_type == 'poisson':
+            from comet_microcircuit_hyperparams import optimizee_params
+            from comet_microcircuit_hyperparams import optimizer_params
+            from comet.models.microcircuit.model_params import net_dict, bounds_dict
+            from comet.models.microcircuit.microcircuit_model import microcircuit_model as sim_model
+        elif args.noise_type == 'pink':
+            raise NotImplementedError('To be implemented')
 
     # Resolve mode arg
     if args.mode == 'syn':
