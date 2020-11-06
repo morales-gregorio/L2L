@@ -41,9 +41,11 @@ class CometOptimizee(Optimizee):
         self.keys_to_evolve = parameters.keys_to_evolve
         self.default_dict = dict()
         self.bounds_dict = dict()
-        for k in parameters.keys_to_evolve:
-            self.default_dict[k] = parameters.default_params_dict[k]
-            self.bounds_dict[k] = parameters.default_bounds_dict[k]
+        self.shape_dict = dict()
+        for key in parameters.keys_to_evolve:
+            self.default_dict[key] = parameters.default_params_dict[key]
+            self.bounds_dict[key] = parameters.default_bounds_dict[key]
+            self.shape_dict[key] = np.array(self.default_dict[key]).shape
 
         self.model_class = parameters.model_class
         self.test_class = parameters.test_class
@@ -57,11 +59,11 @@ class CometOptimizee(Optimizee):
         Also ensures that the new values are within predefined bounds.
         """
         parameter_dict = {}
-        for k in self.keys_to_evolve:
-            n = np.array(self.default_dict[k]).shape
-            minval = self.bounds_dict[k]['min']
-            maxval = self.bounds_dict[k]['max']
-            parameter_dict[k] = np.random.uniform(minval, maxval, size=n)
+        for key in self.keys_to_evolve:
+            n = np.size(self.default_dict[key])
+            minval = self.bounds_dict[key]['min']
+            maxval = self.bounds_dict[key]['max']
+            parameter_dict[key] = np.random.uniform(minval, maxval, size=n)
 
         return parameter_dict
 
@@ -71,35 +73,35 @@ class CometOptimizee(Optimizee):
         Controls that the new values fall within predefined bounds.
         The entries to the dictionary should be numpy arrays.
         """
-        for k in self.keys_to_evolve:
-            n = np.size(individual[k])
+        for key in self.keys_to_evolve:
+            n = np.size(individual[key])
             try:
                 if n == 1:
-                    if individual[k] > self.bounds_dict[k]['max']:
-                        individual[k] = self.bounds_dict[k]['max']
-                    elif individual[k] < self.bounds_dict[k]['min']:
-                        individual[k] = self.bounds_dict[k]['min']
+                    if individual[key] > self.bounds_dict[key]['max']:
+                        individual[key] = self.bounds_dict[key]['max']
+                    elif individual[key] < self.bounds_dict[key]['min']:
+                        individual[key] = self.bounds_dict[key]['min']
                 else:
-                    if isinstance(individual[k], np.ndarray):
-                        ind = individual[k]
+                    if isinstance(individual[key], np.ndarray):
+                        ind = individual[key]
 
                         # Check maximum bounds
-                        max_bound = self.bounds_dict[k]['max']
+                        max_bound = self.bounds_dict[key]['max']
                         max_mask = ind > max_bound
                         ind[max_mask] = max_bound[max_mask]
 
                         # Check minimum bounds
-                        min_bound = self.bounds_dict[k]['min']
+                        min_bound = self.bounds_dict[key]['min']
                         min_mask = ind < min_bound
                         ind[min_mask] = min_bound[min_mask]
 
-                        individual[k] = ind
+                        individual[key] = ind
 
                     else:
                         raise TypeError("Expected a numpy array,"
-                                        "but {k} is {type(individual[k])}")
+                                        "but {key} is {type(individual[key])}")
             except KeyError:
-                print('Undefined bounds for {}'.format[k])
+                print('Undefined bounds for {}'.format[key])
 
         return individual
 
@@ -132,7 +134,10 @@ class CometOptimizee(Optimizee):
         # The defaul parameters are at comet.models.brunel.model_params
         new_params = {}
         for k in traj.individual.params.keys():
-            new_params[k.split('individual.')[-1]] = traj.individual.params[k]
+            flat_params = traj.individual.params[k]
+            # Recovers the original size of the paramter array
+            key = k.split('individual.')[-1]
+            new_params[key] = flat_params.reshape(self.shape_dict[key])
         observation = self.model_class(name='Optimizee',
                                        model_params=new_params,
                                        run_params={'seed': self.seed})
