@@ -8,7 +8,7 @@ seed = 123
 # Optimizee params
 optimizee_params = {
     'seed': seed,
-    'keys_to_evolve': ['conn_probs', 'K_ext', 'bg_rate']
+    'keys_to_evolve': ['P', 'bg_rate', 'P_th']
 }
 
 # Outer-loop optimizer initialization
