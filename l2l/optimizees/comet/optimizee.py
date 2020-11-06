@@ -117,7 +117,7 @@ class CometOptimizee(Optimizee):
         warnings.simplefilter("ignore", category=UserWarning)
 
         # Initialize target model
-        if hasattr(self, 'experiment_class'):
+        if not hasattr(self, 'experiment_class'):
             # Test against synthetic data
             target = self.model_class(name='Synthetic target',
                                       run_params={'seed': self.seed})
