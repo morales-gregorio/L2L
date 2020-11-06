@@ -44,7 +44,8 @@ class CometOptimizee(Optimizee):
         self.shape_dict = dict()
         for key in parameters.keys_to_evolve:
             self.default_dict[key] = parameters.default_params_dict[key]
-            self.bounds_dict[key] = parameters.default_bounds_dict[key]
+            flat_bounds = parameters.default_bounds_dict[key].flatten()
+            self.bounds_dict[key] = flat_bounds()
             self.shape_dict[key] = np.array(self.default_dict[key]).shape
 
         self.model_class = parameters.model_class
@@ -63,8 +64,8 @@ class CometOptimizee(Optimizee):
             n = np.size(self.default_dict[key])
             # Individuals always have flattened lists instead of arrays
             # the array shape is separately stored and used later to reshape
-            minval = self.bounds_dict[key]['min'].flatten()
-            maxval = self.bounds_dict[key]['max'].flatten()
+            minval = self.bounds_dict[key]['min']
+            maxval = self.bounds_dict[key]['max']
             parameter_dict[key] = np.random.uniform(minval, maxval, size=n)
 
         return parameter_dict
