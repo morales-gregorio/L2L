@@ -10,6 +10,7 @@ from l2l.optimizees.optimizee import Optimizee
 CometOptimizeeParameters = \
     namedtuple('CometOptimizeeParameters',
                ['seed',
+                'threads',
                 'keys_to_evolve',
                 'default_params_dict',
                 'default_bounds_dict',
@@ -38,6 +39,7 @@ class CometOptimizee(Optimizee):
         super().__init__(traj)
 
         self.seed = parameters.seed
+        self.threads = parameters.threads
         self.keys_to_evolve = parameters.keys_to_evolve
         self.default_dict = dict()
         self.bounds_dict = dict()
@@ -124,7 +126,9 @@ class CometOptimizee(Optimizee):
         if not hasattr(self, 'experiment_class'):
             # Test against synthetic data
             target = self.model_class(name='Synthetic target',
-                                      run_params={'seed': self.seed})
+                                      run_params={'seed': self.seed,
+                                                  'total_num_virtual_procs':
+                                                      self.threads})
         else:
             # Test against experimental data
             # TODO make this line area sensitive
@@ -142,7 +146,9 @@ class CometOptimizee(Optimizee):
             new_params[key] = flat_params.reshape(self.shape_dict[key])
         observation = self.model_class(name='Optimizee',
                                        model_params=new_params,
-                                       run_params={'seed': self.seed})
+                                       run_params={'seed': self.seed,
+                                                   'total_num_virtual_procs':
+                                                       self.threads})
 
         # Initialize the joint test:
         # * Defines which statistics are calculated

@@ -4,7 +4,8 @@
 # Optimizee params
 optimizee_params = {
     'seed': 123,
-    'keys_to_evolve': ['P']
+    'keys_to_evolve': ['P'],
+    'threads': 8
 }
 
 # Outer-loop optimizer initialization

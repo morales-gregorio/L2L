@@ -13,28 +13,20 @@ import argparse
 
 
 def run_experiment(args):
-    experiment = Experiment(root_dir_path='../results')
-    name = 'L2L-COMET-{}-{}'.format(getuser(),
-                                    datetime.now().strftime("%Y-%m-%d-%H_%M"))
-    trajectory_name = 'comet'
-    jube_params = {"exec": "srun -N 1 -n 1 -c 8 python"}
-    traj, params = experiment.prepare_experiment(
-        trajectory_name=trajectory_name,
-        jube_parameter=jube_params, name=name)
 
     # Resolve model and noise sources from input arguments
     if args.model == 'brunel':
         if args.noise_type == 'poisson':
-            from comet_brunel_hyperparams import optimizee_params
-            from comet_brunel_hyperparams import optimizer_params
+            from comet_brunel_hyperparams import optimizee_params, \
+                optimizer_params
             from comet.models.brunel.model_params import net_dict, bounds_dict
             from comet.models.brunel.brunel_model import brunel_model as sim_model
         elif args.noise_type == 'pink':
             raise NotImplementedError('No pink noise for brunel model')
     elif args.model == 'microcircuit':
         if args.noise_type == 'poisson':
-            from comet_microcircuit_hyperparams import optimizee_params
-            from comet_microcircuit_hyperparams import optimizer_params
+            from comet_microcircuit_hyperparams import optimizee_params, \
+                optimizer_params
             from comet.models.microcircuit.model_params import net_dict, bounds_dict
             from comet.models.microcircuit.microcircuit_model import microcircuit_model as sim_model
         elif args.noise_type == 'pink':
@@ -46,9 +38,20 @@ def run_experiment(args):
     elif args.mode == 'exp':
         raise NotImplementedError('To be implemented')
 
+    # Create experiment class, that deals with jobs and submission
+    experiment = Experiment(root_dir_path='../results')
+    name = 'L2L-COMET-{}-{}'.format(getuser(),
+                                    datetime.now().strftime("%Y-%m-%d-%H_%M"))
+    trajectory_name = 'comet'
+    jube_params = {"exec": f"srun -N 1 -n 1 -c {optimizee_params['threads']} python"}
+    traj, params = experiment.prepare_experiment(
+        trajectory_name=trajectory_name,
+        jube_parameter=jube_params, name=name)
+
     # Set up optimizee
     optimizee_parameters = CometOptimizeeParameters(
         seed=optimizee_params['seed'],
+        threads=optimizee_params['threads'],
         keys_to_evolve=optimizee_params['keys_to_evolve'],
         default_params_dict=net_dict,
         default_bounds_dict=bounds_dict,
