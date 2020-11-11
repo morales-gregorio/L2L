@@ -11,10 +11,10 @@ optimizee_params = {
 # Outer-loop optimizer initialization
 optimizer_params = {
     'seed': 123,
-    'popsize': 24,
+    'popsize': 48,
     'CXPB': 0.8,
     'MUTPB': 0.002,
-    'NGEN': 50,
+    'NGEN': 100,
     'indpb': 0.2,
     'tournsize': 3,
     'matepar': 0.5,
