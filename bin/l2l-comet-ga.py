@@ -84,7 +84,7 @@ def run_experiment(args):
                               optimizee_parameters=optimizee_parameters,
                               optimizer=optimizer,
                               optimizer_parameters=optimizer_parameters)
-    traj, paths = experiment.end(optimizer)
+    traj, paths = experiment.end_experiment(optimizer)
     return traj.v_storage_service.filename, traj.v_name, paths
 
 
