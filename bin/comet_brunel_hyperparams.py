@@ -13,7 +13,7 @@ optimizer_params = {
     'seed': 123,
     'popsize': 48,
     'CXPB': 0.8,
-    'MUTPB': 0.002,
+    'MUTPB': 0.2,
     'NGEN': 100,
     'indpb': 0.2,
     'tournsize': 3,
