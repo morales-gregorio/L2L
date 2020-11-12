@@ -4,7 +4,7 @@
 # Optimizee params
 optimizee_params = {
     'seed': 123,
-    'keys_to_evolve': ['P'],
+    'keys_to_evolve': ['P', 'eta'],
     'threads': 8
 }
 
