@@ -12,8 +12,7 @@ from l2l.optimizers.optimizer import Optimizer
 logger = logging.getLogger("l2l-ga")
 
 GeneticAlgorithmParameters = namedtuple('GeneticAlgorithmParameters',
-                                        ['seed', 'popsize', 'CXPB', 'MUTPB', 'NGEN', 'indpb', 'tournsize', 'matepar',
-                                         'mutpar'])
+                                        ['seed', 'popsize', 'CXPB', 'MUTPB', 'NGEN', 'indpb', 'tournsize', 'mutpar'])
 GeneticAlgorithmParameters.__doc__ = """
 :param seed: Random seed
 :param popsize: Size of the population
@@ -22,7 +21,7 @@ GeneticAlgorithmParameters.__doc__ = """
 :param NGEN: Number of generations simulation should run for
 :param indpb: Probability of mutation of each element in individual
 :param tournsize: Size of the tournamaent used for fitness evaluation and selection
-:param matepar: Paramter used for blending two values during mating
+:param matepar: [NOT NEEDED IN THIS EDITION] Paramter used for blending two values during mating
 """
 
 
@@ -92,7 +91,7 @@ class GeneticAlgorithmOptimizer(Optimizer):
 
             return bounding_wrapper
 
-        toolbox.register("mate", tools.cxBlend, alpha=parameters.matepar)
+        toolbox.register("mate", tools.cxTwoPoint)
         toolbox.decorate("mate", bounding_decorator)
         toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=parameters.mutpar, indpb=traj.indpb)
         toolbox.decorate("mutate", bounding_decorator)

@@ -17,6 +17,5 @@ optimizer_params = {
     'NGEN': 100,
     'indpb': 0.2,
     'tournsize': 3,
-    'matepar': 0.5,
     'mutpar': 0.05
 }

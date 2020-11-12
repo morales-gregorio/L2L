@@ -1,5 +1,7 @@
-# parameters for the l2l-comet-ga.py script
+# parameters for the l2l-comet-[..]-ga.py script
 # MICROCIRCUIT MODEL
+
+# TODO update the keys to evolve !
 
 seed = 123
 
@@ -19,6 +21,5 @@ optimizer_params = {
     'NGEN': 100,
     'indpb': 0.2,
     'tournsize': 3,
-    'matepar': 0.5,
     'mutpar': 0.05
 }
