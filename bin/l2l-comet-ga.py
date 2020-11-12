@@ -70,7 +70,6 @@ def run_experiment(args):
         NGEN=optimizer_params['NGEN'],
         indpb=optimizer_params['indpb'],
         tournsize=optimizer_params['tournsize'],
-        matepar=optimizer_params['matepar'],
         mutpar=optimizer_params['mutpar'])
 
     optimizer = GeneticAlgorithmOptimizer(traj,
