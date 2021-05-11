@@ -15,7 +15,7 @@ CometOptimizeeParameters = \
                 'default_params_dict',
                 'default_bounds_dict',
                 'model_class',
-                'experiment_class',
+                'target_model',
                 'test_class'])
 
 
@@ -51,6 +51,7 @@ class CometOptimizee(Optimizee):
 
         self.model_class = parameters.model_class
         self.test_class = parameters.test_class
+        self.target = parameters.target_model
 
     def create_individual(self):
         """
@@ -122,19 +123,6 @@ class CometOptimizee(Optimizee):
         warnings.simplefilter("ignore", category=FutureWarning)
         warnings.simplefilter("ignore", category=UserWarning)
 
-        # Initialize target model
-        if not hasattr(self, 'experiment_class'):
-            # Test against synthetic data
-            target = self.model_class(name='Synthetic target',
-                                      run_params={'seed': self.seed,
-                                                  'total_num_virtual_procs':
-                                                      self.threads})
-        else:
-            # Test against experimental data
-            # TODO make this line area sensitive
-            raise NotImplementedError('Work in progress')
-            target = self.experiment_class(name='Experimental target')
-
         # Initialize observation model
         # The dictionary `model_params` can be used to set some model params
         # The defaul parameters are at comet.models.brunel.model_params
@@ -155,35 +143,13 @@ class CometOptimizee(Optimizee):
         # * Defines which distance metric will be used to calculate the scores
         test = self.test_class()
 
-        # If default predictions exists load them instead of re-calculating
-        modulefile = sys.modules[self.model_class.__module__].__file__
-        target_pred_path = join(dirname(modulefile),
-                                'predictions', 'default.csv')
-        if isfile(target_pred_path):
-            target_prediction = pd.read_csv(target_pred_path).to_numpy().T
-            test.set_prediction(model=target, prediction=target_prediction)
-            print('Precalculated default model predictions stored in: ',
-                  'memory ' if target._backend.use_memory_cache else '',
-                  'disk' if target._backend.use_disk_cache else '')
-        else:
-            # Target predictions do not exist, therefore they are calculated
-            # Should only happen once in the whole execution (if at all)
-            print('(Re-)calculating the default model predictions.')
-            target_prediction = test.generate_prediction(target)
-            df = pd.DataFrame(data=target_prediction.T,
-                              columns=[t.name for t in test.test_list],
-                              index=np.arange(target_prediction.shape[1]))
-            # Store calculated predictions for the default model
-            if not isdir(dirname(target_pred_path)):
-                os.mkdir(dirname(target_pred_path))
-            df.to_csv(target_pred_path, index=False)
-
         # Run test:
         # * This will run the simulation (for the observation model)
         # * Estimate the statistics and save them as csv files
         # * Then the Wasserstein distance is calculated (for each pair)
-        score = test.judge([target, observation],
+        score = test.judge([self.target, observation],
                            only_lower_triangle=True).iloc[1, 0]
-        score = [score.score]
 
+        # The format in which the score is returned is very important
+        score = [score.score]
         return (score)

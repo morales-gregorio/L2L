@@ -32,21 +32,45 @@ def run_experiment(args):
         elif args.noise_type == 'pink':
             raise NotImplementedError('To be implemented')
 
-    # Resolve mode arg
-    if args.mode == 'syn':
-        exp_model = None
-    elif args.mode == 'exp':
-        raise NotImplementedError('To be implemented')
-
     # Create experiment class, that deals with jobs and submission
-    experiment = Experiment(root_dir_path='../results')
+    results_dir = '../results'
+    experiment = Experiment(root_dir_path=results_dir)
     name = 'L2L-COMET-{}-{}'.format(getuser(),
                                     datetime.now().strftime("%Y-%m-%d-%H_%M"))
+    os.mkdir(join(results_dir, name))  # Pre-create the results directory
     trajectory_name = 'comet'
-    jube_params = {"exec": f"srun -N 1 -n 1 -c {optimizee_params['threads']} python"}
+    jube_params = \
+        {"exec": f"srun -N 1 -n 1 -c {optimizee_params['threads']} python"}
     traj, params = experiment.prepare_experiment(
         trajectory_name=trajectory_name,
         jube_parameter=jube_params, name=name)
+
+    # Create target predictions (either synthetic data or experimental)
+    predictions_csv = join(results_dir, name, 'target_predictions.csv')
+    if args.mode == 'syn':
+        # Calculate target predictions
+        target = self.target_class(
+                     name='Synthetic target',
+                     run_params={'seed': optimizee_params['seed'],
+                                 'total_num_virtual_procs':
+                                     optimizee_params['threads']})
+        print('Calculating the default model predictions.')
+        test = self.test_class()
+        target_prediction = test.generate_prediction(target)
+
+        # Delete spiketrains to free memory
+        target.spiketrains = None
+        target.grouped_spiketrains = None
+
+        # Save predictions to results directory, for future reference
+        df = pd.DataFrame(data=target_prediction.T,
+                          columns=[t.name for t in test.test_list],
+                          index=np.arange(target_prediction.shape[1]))
+        # Store calculated predictions for the default model
+        df.to_csv(target_pred_path, index=False)
+
+    elif args.mode == 'exp':
+        raise NotImplementedError('To be implemented')
 
     # Set up optimizee
     optimizee_parameters = CometOptimizeeParameters(
@@ -56,7 +80,7 @@ def run_experiment(args):
         default_params_dict=net_dict,
         default_bounds_dict=bounds_dict,
         model_class=sim_model,
-        experiment_class=exp_model,
+        target_model=target,
         test_class=joint_test)
     # Inner-loop simulator
     optimizee = CometOptimizee(traj, optimizee_parameters)
@@ -72,11 +96,12 @@ def run_experiment(args):
         tournsize=optimizer_params['tournsize'],
         mutpar=optimizer_params['mutpar'])
 
-    optimizer = GeneticAlgorithmOptimizer(traj,
-                                          optimizee_create_individual=optimizee.create_individual,
-                                          parameters=optimizer_parameters,
-                                          optimizee_bounding_func=optimizee.bounding_func,
-                                          optimizee_fitness_weights=(-1,))
+    optimizer = GeneticAlgorithmOptimizer(
+                    traj,
+                    optimizee_create_individual=optimizee.create_individual,
+                    parameters=optimizer_parameters,
+                    optimizee_bounding_func=optimizee.bounding_func,
+                    optimizee_fitness_weights=(-1,))
 
     # Add post processing
     experiment.run_experiment(optimizee=optimizee,
