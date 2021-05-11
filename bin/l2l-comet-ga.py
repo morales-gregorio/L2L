@@ -9,6 +9,7 @@ from comet.evaluation.joint_test import joint_test
 import os
 from os.path import join
 import pandas as pd
+import numpy as np
 import argparse
 
 
