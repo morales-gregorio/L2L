@@ -145,6 +145,10 @@ class CometOptimizee(Optimizee):
         score = self.test.judge([self.target, observation],
                                 only_lower_triangle=True).iloc[1, 0]
 
+        # Cleanup to avoid pickling large objects
+        self.test = None
+        self.target = None
+
         # The format in which the score is returned is very important
         score = [score.score]
         return (score)
