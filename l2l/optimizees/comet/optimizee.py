@@ -16,7 +16,7 @@ CometOptimizeeParameters = \
                 'default_bounds_dict',
                 'model_class',
                 'target_model',
-                'test_class'])
+                'test_model'])
 
 
 class CometOptimizee(Optimizee):
@@ -50,8 +50,8 @@ class CometOptimizee(Optimizee):
             self.shape_dict[key] = np.array(self.default_dict[key]).shape
 
         self.model_class = parameters.model_class
-        self.test_class = parameters.test_class
         self.target = parameters.target_model
+        self.test = parameters.test_model
 
     def create_individual(self):
         """
@@ -138,17 +138,12 @@ class CometOptimizee(Optimizee):
                                                    'total_num_virtual_procs':
                                                        self.threads})
 
-        # Initialize the joint test:
-        # * Defines which statistics are calculated
-        # * Defines which distance metric will be used to calculate the scores
-        test = self.test_class()
-
         # Run test:
         # * This will run the simulation (for the observation model)
         # * Estimate the statistics and save them as csv files
         # * Then the Wasserstein distance is calculated (for each pair)
-        score = test.judge([self.target, observation],
-                           only_lower_triangle=True).iloc[1, 0]
+        score = self.test.judge([self.target, observation],
+                                only_lower_triangle=True).iloc[1, 0]
 
         # The format in which the score is returned is very important
         score = [score.score]

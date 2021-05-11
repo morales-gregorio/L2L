@@ -48,18 +48,18 @@ def run_experiment(args):
     predictions_csv = join(results_dir, name, 'target_predictions.csv')
     if args.mode == 'syn':
         # Calculate target predictions
-        target = self.target_class(
-                     name='Synthetic target',
-                     run_params={'seed': optimizee_params['seed'],
-                                 'total_num_virtual_procs':
-                                     optimizee_params['threads']})
+        target = sim_model(name='Synthetic target',
+                           run_params={'seed': optimizee_params['seed'],
+                                       'total_num_virtual_procs':
+                                           optimizee_params['threads']})
         print('Calculating the default model predictions.')
-        test = self.test_class()
+        test = joint_test()
         target_prediction = test.generate_prediction(target)
 
         # Delete spiketrains to free memory
         target.spiketrains = None
         target.grouped_spiketrains = None
+        test.set_prediction(model=target, prediction=target_prediction)
 
         # Save predictions to results directory, for future reference
         df = pd.DataFrame(data=target_prediction.T,
@@ -80,7 +80,7 @@ def run_experiment(args):
         default_bounds_dict=bounds_dict,
         model_class=sim_model,
         target_model=target,
-        test_class=joint_test)
+        test_class=test)
     # Inner-loop simulator
     optimizee = CometOptimizee(traj, optimizee_parameters)
 
