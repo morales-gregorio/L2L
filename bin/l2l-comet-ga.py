@@ -61,6 +61,7 @@ def run_experiment(args):
         # Delete spiketrains to free memory
         target.spiketrains = None
         target.grouped_spiketrains = None
+        target.nest_instance = None
         test.set_prediction(model=target, prediction=target_prediction)
 
         # Save predictions to results directory, for future reference
