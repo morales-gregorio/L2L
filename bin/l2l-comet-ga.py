@@ -1,14 +1,12 @@
 from datetime import datetime
 from getpass import getuser
-
 from l2l.optimizees.comet.optimizee import CometOptimizee, \
     CometOptimizeeParameters
 from l2l.optimizers.evolution import GeneticAlgorithmOptimizer,\
     GeneticAlgorithmParameters
 from l2l.utils.experiment import Experiment
-
 from comet.evaluation.joint_test import joint_test
-
+import os
 import argparse
 
 
