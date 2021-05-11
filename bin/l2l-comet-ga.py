@@ -68,7 +68,7 @@ def run_experiment(args):
                           columns=[t.name for t in test.test_list],
                           index=np.arange(target_prediction.shape[1]))
         # Store calculated predictions for the default model
-        df.to_csv(target_pred_path, index=False)
+        df.to_csv(predictions_csv, index=False)
 
     elif args.mode == 'exp':
         raise NotImplementedError('To be implemented')
