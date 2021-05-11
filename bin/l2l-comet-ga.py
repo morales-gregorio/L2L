@@ -5,7 +5,7 @@ from l2l.optimizees.comet.optimizee import CometOptimizee, \
 from l2l.optimizers.evolution import GeneticAlgorithmOptimizer,\
     GeneticAlgorithmParameters
 from l2l.utils.experiment import Experiment
-from comet.evaluation.joint_test import joint_test
+from comet.evaluation.joint_test import joint_test as test_class
 import os
 from os.path import join
 import pandas as pd
@@ -55,20 +55,13 @@ def run_experiment(args):
                                        'total_num_virtual_procs':
                                            optimizee_params['threads']})
         print('Calculating the default model predictions.')
-        test = joint_test()
+        test = test_class()
         target_prediction = test.generate_prediction(target)
 
-        # Delete spiketrains to free memory
-        target.spiketrains = None
-        target.grouped_spiketrains = None
-        target.nest_instance = None
-        test.set_prediction(model=target, prediction=target_prediction)
-
-        # Save predictions to results directory, for future reference
+        # Save predictions to results directory
         df = pd.DataFrame(data=target_prediction.T,
                           columns=[t.name for t in test.test_list],
                           index=np.arange(target_prediction.shape[1]))
-        # Store calculated predictions for the default model
         df.to_csv(predictions_csv, index=False)
 
     elif args.mode == 'exp':
@@ -82,8 +75,9 @@ def run_experiment(args):
         default_params_dict=net_dict,
         default_bounds_dict=bounds_dict,
         model_class=sim_model,
-        target_model=target,
-        test_model=test)
+        target_class=sim_model,
+        target_predictions_csv=predictions_csv,
+        test_class=test_class)
     # Inner-loop simulator
     optimizee = CometOptimizee(traj, optimizee_parameters)
 

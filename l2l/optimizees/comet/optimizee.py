@@ -15,8 +15,9 @@ CometOptimizeeParameters = \
                 'default_params_dict',
                 'default_bounds_dict',
                 'model_class',
-                'target_model',
-                'test_model'])
+                'target_class',
+                'target_predictions_csv',
+                'test_class'])
 
 
 class CometOptimizee(Optimizee):
@@ -44,14 +45,16 @@ class CometOptimizee(Optimizee):
         self.default_dict = dict()
         self.bounds_dict = dict()
         self.shape_dict = dict()
+
         for key in parameters.keys_to_evolve:
             self.default_dict[key] = parameters.default_params_dict[key]
             self.bounds_dict[key] = parameters.default_bounds_dict[key]
             self.shape_dict[key] = np.array(self.default_dict[key]).shape
 
         self.model_class = parameters.model_class
-        self.target = parameters.target_model
-        self.test = parameters.test_model
+        self.target_class = parameters.target_class
+        self.target_pred_csv = parameters.target_predictions_csv
+        self.test_class = parameters.test_class
 
     def create_individual(self):
         """
@@ -138,16 +141,20 @@ class CometOptimizee(Optimizee):
                                                    'total_num_virtual_procs':
                                                        self.threads})
 
+        # Instantiate test
+        test = self.test_class()
+
+        # Instantiate target and set pre-calculated predictions
+        target = self.target_class(name='Target')
+        target_prediction = pd.read_csv(self.target_pred_csv).to_numpy().T
+        test.set_prediction(model=target, prediction=target_prediction)
+
         # Run test:
         # * This will run the simulation (for the observation model)
         # * Estimate the statistics and save them as csv files
         # * Then the Wasserstein distance is calculated (for each pair)
-        score = self.test.judge([self.target, observation],
-                                only_lower_triangle=True).iloc[1, 0]
-
-        # Cleanup to avoid pickling large objects
-        self.test = None
-        self.target = None
+        score = test.judge([target, observation],
+                           only_lower_triangle=True).iloc[1, 0]
 
         # The format in which the score is returned is very important
         score = [score.score]
