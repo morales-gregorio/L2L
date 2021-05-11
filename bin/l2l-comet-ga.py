@@ -82,7 +82,7 @@ def run_experiment(args):
         default_bounds_dict=bounds_dict,
         model_class=sim_model,
         target_model=target,
-        test_class=test)
+        test_model=test)
     # Inner-loop simulator
     optimizee = CometOptimizee(traj, optimizee_parameters)
 
