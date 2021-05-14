@@ -34,7 +34,7 @@ def run_experiment(args):
             raise NotImplementedError('To be implemented')
 
     # Create experiment class, that deals with jobs and submission
-    results_dir = '../results'
+    results_dir = '/users/morales/comet2ltl/results'  # XXX Hard coded
     experiment = Experiment(root_dir_path=results_dir)
     name = 'L2L-COMET-{}-{}'.format(getuser(),
                                     datetime.now().strftime("%Y-%m-%d-%H_%M"))
