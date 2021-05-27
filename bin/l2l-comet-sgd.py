@@ -89,7 +89,8 @@ def run_experiment(args):
                                         exploration_step_size=0.01,
                                         n_random_steps=64,  # ~ Population size
                                         n_iteration=100,
-                                        stop_criterion=-np.inf)
+                                        stop_criterion=-np.inf,
+                                        seed=1234)
 
     optimizer = GradientDescentOptimizer(
         traj,
