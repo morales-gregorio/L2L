@@ -87,7 +87,7 @@ def run_experiment(args):
                                         stochastic_deviation=1,
                                         stochastic_decay=0.99,
                                         exploration_step_size=0.01,
-                                        n_random_steps=5,
+                                        n_random_steps=64,  # ~ Population size
                                         n_iteration=100,
                                         stop_criterion=-np.inf)
 
