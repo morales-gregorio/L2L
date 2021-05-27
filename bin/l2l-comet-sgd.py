@@ -83,20 +83,21 @@ def run_experiment(args):
     optimizee = CometOptimizee(traj, optimizee_parameters)
 
     # Outer-loop optimizer initialization
-    parameters = StochasticGDParameters(learning_rate=0.01,
-                                        stochastic_deviation=1,
-                                        stochastic_decay=0.99,
-                                        exploration_step_size=0.01,
-                                        n_random_steps=64,  # ~ Population size
-                                        n_iteration=100,
-                                        stop_criterion=-np.inf,
-                                        seed=1234)
+    optimizer_parameters = StochasticGDParameters(
+        learning_rate=0.01,
+        stochastic_deviation=1,
+        stochastic_decay=0.99,
+        exploration_step_size=0.01,
+        n_random_steps=64,  # ~ Population size
+        n_iteration=100,
+        stop_criterion=-np.inf,
+        seed=1234)
 
     optimizer = GradientDescentOptimizer(
         traj,
         optimizee_create_individual=optimizee.create_individual,
         optimizee_fitness_weights=(-1.,),
-        parameters=parameters,
+        parameters=optimizer_parameters,
         optimizee_bounding_func=optimizee.bounding_func)
 
     # Add post processing
