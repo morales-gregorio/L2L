@@ -96,8 +96,8 @@ def run_experiment(args):
 
     optimizer_parameters = ClassicGDParameters(
         learning_rate=0.01,  #
-        exploration_step_size=0.01,  # Step from one iteration to the next (probably absolute, no matter what the parameter ranges are)
-        n_random_steps=32,  # Number of samples around the current point
+        exploration_step_size=0.025,  # Step from one iteration to the next (probably absolute, no matter what the parameter ranges are)
+        n_random_steps=15,  # Number of samples around the current point
         n_iteration=200,
         stop_criterion=np.inf,
         seed=12345)
