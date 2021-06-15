@@ -4,14 +4,14 @@
 # Optimizee params
 optimizee_params = {
     'seed': 123,
-    'keys_to_evolve': ['P', 'eta'],
+    'keys_to_evolve': ['P'],
     'threads': 8
 }
 
 # Outer-loop optimizer initialization
 optimizer_params = {
     'seed': 1234,
-    'popsize': 48,
+    'popsize': 6,
     'CXPB': 0.8,
     'MUTPB': 0.2,
     'NGEN': 100,
