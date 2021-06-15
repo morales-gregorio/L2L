@@ -4,6 +4,7 @@ from l2l.optimizees.comet.optimizee import CometOptimizee, \
     CometOptimizeeParameters
 from l2l.optimizers.gradientdescent.optimizer import GradientDescentOptimizer
 from l2l.optimizers.gradientdescent.optimizer import StochasticGDParameters
+from l2l.optimizers.gradientdescent.optimizer import ClassicGDParameters
 from l2l.utils.experiment import Experiment
 from comet.evaluation.joint_test import joint_test as test_class
 import os
@@ -82,16 +83,23 @@ def run_experiment(args):
     # Inner-loop simulator
     optimizee = CometOptimizee(traj, optimizee_parameters)
 
-    # Outer-loop optimizer initialization
-    optimizer_parameters = StochasticGDParameters(
-        learning_rate=0.01,
-        stochastic_deviation=1,
-        stochastic_decay=0.99,
-        exploration_step_size=0.01,
-        n_random_steps=64,  # ~ Population size
-        n_iteration=100,
-        stop_criterion=-np.inf,
-        seed=1234)
+    # # Outer-loop optimizer initialization
+    # optimizer_parameters = StochasticGDParameters(
+    #     learning_rate=0.01,  #
+    #     stochastic_deviation=0.5,  #
+    #     stochastic_decay=0.99,  #
+    #     exploration_step_size=0.01,  # Step from one iteration to the next (probably absolute, no matter what the parameter ranges are)
+    #     n_random_steps=32,  # Number of samples around the current point
+    #     n_iteration=200,
+    #     stop_criterion=-np.inf,
+    #     seed=1234)
+
+    optimizer_parameters = ClassicGDParameters(
+        learning_rate=0.01,  #
+        exploration_step_size=0.01,  # Step from one iteration to the next (probably absolute, no matter what the parameter ranges are)
+        n_random_steps=32,  # Number of samples around the current point
+        n_iteration=200,
+        stop_criterion=np.inf)
 
     optimizer = GradientDescentOptimizer(
         traj,
