@@ -99,7 +99,8 @@ def run_experiment(args):
         exploration_step_size=0.01,  # Step from one iteration to the next (probably absolute, no matter what the parameter ranges are)
         n_random_steps=32,  # Number of samples around the current point
         n_iteration=200,
-        stop_criterion=np.inf)
+        stop_criterion=np.inf,
+        seed=12345)
 
     optimizer = GradientDescentOptimizer(
         traj,
