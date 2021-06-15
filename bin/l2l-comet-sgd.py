@@ -41,7 +41,7 @@ def run_experiment(args):
     os.mkdir(join(results_dir, name))  # Pre-create the results directory
     trajectory_name = 'comet'
     jube_params = \
-        {"exec": f"srun -N 1 -n 1 -c {optimizee_params['threads']} --exclusive python"}
+        {"exec": f"srun -n 1 -c {optimizee_params['threads']} --exclusive python"}
     traj, params = experiment.prepare_experiment(
         trajectory_name=trajectory_name,
         jube_parameter=jube_params, name=name)
