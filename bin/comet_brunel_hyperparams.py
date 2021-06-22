@@ -5,17 +5,18 @@
 optimizee_params = {
     'seed': 123,
     'keys_to_evolve': ['P'],
-    'threads': 16
+    'threads': 4
 }
 
 # Outer-loop optimizer initialization
 optimizer_params = {
     'seed': 1234,
-    'popsize': 6,
-    'CXPB': 0.8,
-    'MUTPB': 0.2,
-    'NGEN': 100,
-    'indpb': 0.2,
-    'tournsize': 3,
-    'mutpar': 0.05
+    'pop_size': 36,
+    'cx_prob': 0.8,
+    'mut_prob': 0.2,
+    'n_iteration': 100,
+    'ind_prob': 0.2,
+    'tourn_size': 3,
+    'mut_par': 0.05,
+    'mate_par': 0.5
 }

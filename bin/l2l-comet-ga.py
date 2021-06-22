@@ -36,8 +36,8 @@ def run_experiment(args):
     # Create experiment class, that deals with jobs and submission
     results_dir = '/users/morales/comet2ltl/results'  # XXX Hard coded
     experiment = Experiment(root_dir_path=results_dir)
-    name = 'L2L-COMET-{}-{}'.format(getuser(),
-                                    datetime.now().strftime("%Y-%m-%d-%H_%M"))
+    name = 'L2L-COMET-GA-{}-{}'.format(getuser(),
+                                       datetime.now().strftime("%Y-%m-%d-%H_%M"))
     os.mkdir(join(results_dir, name))  # Pre-create the results directory
     trajectory_name = 'comet'
     jube_params = \
@@ -83,14 +83,15 @@ def run_experiment(args):
 
     # Outer-loop optimizer initialization
     optimizer_parameters = GeneticAlgorithmParameters(
-        popsize=optimizer_params['popsize'],
+        pop_size=optimizer_params['pop_size'],
         seed=optimizer_params['seed'],
-        CXPB=optimizer_params['CXPB'],
-        MUTPB=optimizer_params['MUTPB'],
-        NGEN=optimizer_params['NGEN'],
-        indpb=optimizer_params['indpb'],
-        tournsize=optimizer_params['tournsize'],
-        mutpar=optimizer_params['mutpar'])
+        cx_prob=optimizer_params['cx_prob'],
+        mut_prob=optimizer_params['mut_prob'],
+        n_iteration=optimizer_params['n_iteration'],
+        ind_prob=optimizer_params['ind_prob'],
+        tourn_size=optimizer_params['tourn_size'],
+        mut_par=optimizer_params['mut_par'],
+        mate_par=optimizer_params['mate_par'])
 
     optimizer = GeneticAlgorithmOptimizer(
                     traj,
