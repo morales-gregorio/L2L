@@ -35,7 +35,7 @@ optimizer_params = {
 }
 
 
-def run_experiment(args):
+def run_experiment():
 
     # TESTSUITE EXCLUSIVE: reduce model sizes for fast testing
     net_dict['N'] = np.array([100, 25])
