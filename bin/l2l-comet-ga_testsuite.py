@@ -12,14 +12,32 @@ import pandas as pd
 import numpy as np
 import argparse
 
+# Optimizee params
+optimizee_params = {
+    'seed': 123,
+    'keys_to_evolve': ['P'],
+    'threads': 1
+}
+
+# Outer-loop optimizer initialization
+optimizer_params = {
+    'seed': 1234,
+    'pop_size': 30,
+    'cx_prob': 0.8,
+    'mut_prob': 0.2,
+    'n_iteration': 10,
+    'ind_prob': 0.2,
+    'tourn_size': 3,
+    'mut_par': 0.05,
+    'mate_par': 0.5
+}
+
 
 def run_experiment(args):
 
     # Resolve model and noise sources from input arguments
     if args.model == 'brunel':
         if args.noise_type == 'poisson':
-            from comet_brunel_hyperparams import optimizee_params, \
-                optimizer_params
             from comet.models.brunel.model_params import net_dict, bounds_dict
             from comet.models.brunel.brunel_model import brunel_model as sim_model
         elif args.noise_type == 'pink':
@@ -44,7 +62,7 @@ def run_experiment(args):
     os.mkdir(join(results_dir, name))  # Pre-create the results directory
     trajectory_name = 'comet'
     jube_params = \
-        {"exec": f"srun -N 1 -n 1 -c 1 python"}
+        {"exec": f"srun -N 1 -n 1 -c {optimizee_params['threads']} python"}
     traj, params = experiment.prepare_experiment(
         trajectory_name=trajectory_name,
         jube_parameter=jube_params, name=name)
