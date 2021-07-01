@@ -55,24 +55,21 @@ def run_experiment(args):
 
     # Create target predictions (either synthetic data or experimental)
     predictions_csv = join(results_dir, name, 'target_predictions.csv')
-    if args.mode == 'syn':
-        # Calculate target predictions
-        target = sim_model(name='Synthetic target',
-                           run_params={'seed': optimizee_params['seed'],
-                                       'total_num_virtual_procs':
-                                           optimizee_params['threads']})
-        print('Calculating the default model predictions.')
-        test = test_class()
-        target_prediction = test.generate_prediction(target)
 
-        # Save predictions to results directory
-        df = pd.DataFrame(data=target_prediction.T,
-                          columns=[t.name for t in test.test_list],
-                          index=np.arange(target_prediction.shape[1]))
-        df.to_csv(predictions_csv, index=False)
+    # Calculate target predictions
+    target = sim_model(name='Synthetic target',
+                       run_params={'seed': optimizee_params['seed'],
+                                   'total_num_virtual_procs':
+                                       optimizee_params['threads']})
+    print('Calculating the default model predictions.')
+    test = test_class()
+    target_prediction = test.generate_prediction(target)
 
-    elif args.mode == 'exp':
-        raise NotImplementedError('To be implemented')
+    # Save predictions to results directory
+    df = pd.DataFrame(data=target_prediction.T,
+                      columns=[t.name for t in test.test_list],
+                      index=np.arange(target_prediction.shape[1]))
+    df.to_csv(predictions_csv, index=False)
 
     # Set up optimizee
     optimizee_parameters = CometOptimizeeParameters(
@@ -116,26 +113,9 @@ def run_experiment(args):
     return traj.v_storage_service.filename, traj.v_name, paths
 
 
-def main(args):
-    filename, trajname, paths = run_experiment(args)
+def main():
+    filename, trajname, paths = run_experiment()
 
 
 if __name__ == '__main__':
-    formatter = argparse.RawDescriptionHelpFormatter
-    parser = argparse.ArgumentParser(description=__doc__,
-                                     formatter_class=formatter)
-    parser.add_argument("--model", choices=['brunel', 'microcircuit'],
-                        required=True,
-                        help="Network model of choice")
-    parser.add_argument("--noise_type", choices=['poisson', 'pink'],
-                        required=True,
-                        help="External noise input type")
-    parser.add_argument("--mode", choices=['syn', 'exp'], required=True,
-                        help="""[syn] run optimization on synthetic data,
-                                [exp] run optimization on experimental data""")
-    parser.add_argument("--area", nargs='?', type=str, required=False,
-                        help="[str] area name")
-    args = parser.parse_args()
-    if args.mode == 'exp' and args.area is None:
-        parser.error("--area needs to be specified if --mode is 'exp'")
-    main(args)
+    main()
