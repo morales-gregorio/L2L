@@ -9,6 +9,7 @@ from deap.tools import HallOfFame
 from l2l import dict_to_list, list_to_dict
 from l2l.optimizers.optimizer import Optimizer
 
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("l2l-ga")
 
 GeneticAlgorithmParameters = namedtuple('GeneticAlgorithmParameters',
@@ -143,8 +144,9 @@ class GeneticAlgorithmOptimizer(Optimizer):
         logger.info("-- End of generation {} --".format(self.g))
         best_inds = tools.selBest(self.eval_pop_inds, 2)
         self.best_individual = list_to_dict(best_inds[0], self.optimizee_individual_dict_spec)
+        print('Best individuals are:')
         for best_ind in best_inds:
-            print("Best individual is %s, %s" % (list_to_dict(best_ind, self.optimizee_individual_dict_spec),
+            print("\t%s, %s" % (list_to_dict(best_ind, self.optimizee_individual_dict_spec),
                                                  best_ind.fitness.values))
 
         self.hall_of_fame.update(self.eval_pop_inds)
