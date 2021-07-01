@@ -11,6 +11,8 @@ from os.path import join
 import pandas as pd
 import numpy as np
 import argparse
+from comet.models.brunel.model_params import net_dict, bounds_dict
+from comet.models.brunel.brunel_model import brunel_model as sim_model
 
 # Optimizee params
 optimizee_params = {
@@ -34,22 +36,6 @@ optimizer_params = {
 
 
 def run_experiment(args):
-
-    # Resolve model and noise sources from input arguments
-    if args.model == 'brunel':
-        if args.noise_type == 'poisson':
-            from comet.models.brunel.model_params import net_dict, bounds_dict
-            from comet.models.brunel.brunel_model import brunel_model as sim_model
-        elif args.noise_type == 'pink':
-            raise NotImplementedError('No pink noise for brunel model')
-    elif args.model == 'microcircuit':
-        if args.noise_type == 'poisson':
-            from comet_microcircuit_hyperparams import optimizee_params, \
-                optimizer_params
-            from comet.models.microcircuit.model_params import net_dict, bounds_dict
-            from comet.models.microcircuit.microcircuit_model import microcircuit_model as sim_model
-        elif args.noise_type == 'pink':
-            raise NotImplementedError('To be implemented')
 
     # TESTSUITE EXCLUSIVE: reduce model sizes for fast testing
     net_dict['N'] = np.array([100, 25])
