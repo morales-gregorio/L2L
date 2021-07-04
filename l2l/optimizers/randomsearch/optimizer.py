@@ -9,7 +9,7 @@ from l2l.optimizers.optimizer import Optimizer
 
 RandomSearchParameters = namedtuple('GeneticAlgorithmParameters',
                                     ['seed', 'pop_size', 'n_iteration',
-                                     'mut_sigma', 'p_survival'])
+                                     'mut_sigma', 'p_survive'])
 RandomSearchParameters.__doc__ = """
 :param seed: Random seed
 :param pop_size: Size of the population
