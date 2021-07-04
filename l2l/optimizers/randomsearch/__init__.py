@@ -1,5 +1,5 @@
-from .optimizer import GeneticAlgorithmParameters
-from .optimizer import GeneticAlgorithmOptimizer
+from .optimizer import RandomSearchParameters
+from .optimizer import RandomSearchOptimizer
 
 __all__ = [
     'RandomSearchParameters',
