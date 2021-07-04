@@ -103,6 +103,7 @@ class RandomSearchOptimizer(Optimizer):
 
         # ------- Initialize Population and Trajectory -------- #
         # NOTE: The Individual object implements the list interface.
+        self.pop = []
         for _ in range(parameters.pop_size):
             ind = simpleIndividual(dict_to_list(self.new_ind()))
             self.pop.append(ind)
