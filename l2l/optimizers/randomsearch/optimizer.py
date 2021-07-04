@@ -1,7 +1,7 @@
 import random
 
 from collections import namedtuple
-from deepcopy import deepcopy
+from copy import deepcopy
 from itertools import repeat
 
 from l2l import dict_to_list, list_to_dict
