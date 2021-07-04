@@ -27,67 +27,67 @@ AvailableCoolingSchedules = Enum('Schedule', 'DEFAULT LOGARITHMIC EXPONENTIAL LI
 
 """
 Multiplicative Monotonic Cooling
-This schedule type multiplies the starting temperature by a factor that 
-decreases over time (number k of the performed iteration steps). It requires a 
-decay parameter (alpha) but not an ending temperature, as the prgression of the 
-temperature is well definded by the decay parameter only. The Multiplicative 
-Monotonic Cooling schedules are: Exponential multiplicative cooling, 
-Logarithmical multiplicative cooling, Linear multiplicative cooling and 
+This schedule type multiplies the starting temperature by a factor that
+decreases over time (number k of the performed iteration steps). It requires a
+decay parameter (alpha) but not an ending temperature, as the prgression of the
+temperature is well definded by the decay parameter only. The Multiplicative
+Monotonic Cooling schedules are: Exponential multiplicative cooling,
+Logarithmical multiplicative cooling, Linear multiplicative cooling and
 Quadratic multiplicative cooling.
 Source: Kirkpatrick, Gelatt and Vecchi (1983)
 
 - Exponential multiplicative cooling
-Default cooling schedule for typical applications of simulated annealing. Each 
-step, the temperature T_k is multiplied by the factor alpha (which has to be 
-between 0 and 1) or in other words it is the starting temperature T_0 
+Default cooling schedule for typical applications of simulated annealing. Each
+step, the temperature T_k is multiplied by the factor alpha (which has to be
+between 0 and 1) or in other words it is the starting temperature T_0
 multiplied by the factor alpha by the power of k: T_k = T_0 * alpha^k
 
 - Logarithmical multiplicative cooling
-The factor by which the temperature decreases, is indirectly proportional to 
-the log of k.  Therefore it slows down the cooling, the further progressed 
-the schedule is. Alpha has to be largert than one. 
+The factor by which the temperature decreases, is indirectly proportional to
+the log of k.  Therefore it slows down the cooling, the further progressed
+the schedule is. Alpha has to be largert than one.
 T_k = T_0 / ( 1 + alpha* log (1 + k) )
 
 - Linear multiplicative cooling
-Behaves similar to Logarithmical multiplicative cooling in that the decrease 
-gets lower over time, but not as pronounced. The decrease is indirectly 
+Behaves similar to Logarithmical multiplicative cooling in that the decrease
+gets lower over time, but not as pronounced. The decrease is indirectly
 proportional to alpha times k and alpha has to be larger than zero:
 T_k = T_0 / ( 1 + alpha*k)
 
-- Quadratic multiplicative cooling 
-This schedule stays at high temperatures longer, than the other schedules and 
+- Quadratic multiplicative cooling
+This schedule stays at high temperatures longer, than the other schedules and
 has a steeper cooling later in the process. Alpha has to be larger than zero.
 T_k = T_0 / ( 1 + alpha*k^2)
 
 Additive Monotonic Cooling
-The differences to Multiplicative Monotonic Cooling are, that the final 
-temperature T_n and the number of iterations n are needed also. So this 
-cannot be used as intended, if the stop criterion is something different, 
-than a certain number of iteration steps. A decay parameter is not needed. 
-Each temperature is computed, by adding a term to the final temperature. The 
-Additive Monotonic Cooling schedules are: Linear additive cooling, Quadratic 
-additive cooling, Exponential additive cooling and Trigonometric additive 
+The differences to Multiplicative Monotonic Cooling are, that the final
+temperature T_n and the number of iterations n are needed also. So this
+cannot be used as intended, if the stop criterion is something different,
+than a certain number of iteration steps. A decay parameter is not needed.
+Each temperature is computed, by adding a term to the final temperature. The
+Additive Monotonic Cooling schedules are: Linear additive cooling, Quadratic
+additive cooling, Exponential additive cooling and Trigonometric additive
 cooling.
-Source. Additive monotonic cooling B. T. Luke (2005) 
+Source. Additive monotonic cooling B. T. Luke (2005)
 
-- Linear additive cooling 
-This schedule adds a term to the final temperature, which decreases linearily 
+- Linear additive cooling
+This schedule adds a term to the final temperature, which decreases linearily
 with the progression of the schedule.
 T_k = T_n + (T_0 -T_n)*((n-k)/n)
 
-- Quadratic additive cooling 
+- Quadratic additive cooling
 This schedule adds a term to the final temperature, which decreases q
 uadratically with the progression of the schedule.
 T_k = T_n + (T_0 -T_n)*((n-k)/n)^2
 
 - Exponential additive
-Uses a complicated formula, to come up with a schedule, that has a slow start, 
-a steep decrease in temperature in the middle and a slow decrease at the end 
+Uses a complicated formula, to come up with a schedule, that has a slow start,
+a steep decrease in temperature in the middle and a slow decrease at the end
 of the process.
 T_k = T_n + (T_0 - T_n) * (1/(1+exp( 2*ln(T_0 - T_n)/n * (k- n/2) ) ) )
 
 - Trigonometric additive cooling
-This schedule has a similar behavior as Exponential additive, but less pronounced. 
+This schedule has a similar behavior as Exponential additive, but less pronounced.
 T_k = T_n + (T_0 - T_n)/2 * (1+cos(k*pi/n))
 
 """
@@ -163,25 +163,25 @@ class SimulatedAnnealingOptimizer(Optimizer):
 
         self.eval_pop = new_individual_list
         self._expand_trajectory(traj)
-        
+
         self.cooling_schedule = parameters.cooling_schedule
 
-    def cooling(self,temperature, cooling_schedule, temperature_decay, temperature_end, steps_total):        
+    def cooling(self,temperature, cooling_schedule, temperature_decay, temperature_end, steps_total):
         # assumes, that the temperature always starts at 1
         T0 = 1
-        k = self.g + 1    
-      
+        k = self.g + 1
+
         if cooling_schedule == AvailableCoolingSchedules.DEFAULT:
             return temperature * temperature_decay
-          
-        # Simulated Annealing and Boltzmann Machines: 
+
+        # Simulated Annealing and Boltzmann Machines:
         # A Stochastic Approach to Combinatorial Optimization and Neural Computing (1989)
         elif cooling_schedule == AvailableCoolingSchedules.LOGARITHMIC:
             return T0 / (1 + np.log(1 + k))
-            
+
         # Kirkpatrick, Gelatt and Vecchi (1983)
         elif cooling_schedule == AvailableCoolingSchedules.EXPONENTIAL:
-            alpha = 0.85 
+            alpha = 0.85
             return T0 * (alpha ** (k))
         elif cooling_schedule == AvailableCoolingSchedules.LINEAR_MULTIPLICATIVE:
             alpha = 1
@@ -189,13 +189,13 @@ class SimulatedAnnealingOptimizer(Optimizer):
         elif cooling_schedule == AvailableCoolingSchedules.QUADRATIC_MULTIPLICATIVE:
             alpha = 1
             return T0 / (1 + alpha * np.square(k))
-            
-        # Additive monotonic cooling B. T. Luke (2005) 
+
+        # Additive monotonic cooling B. T. Luke (2005)
         elif cooling_schedule == AvailableCoolingSchedules.LINEAR_ADDAPTIVE:
             return temperature_end + (T0 - temperature) * ((steps_total - k) / steps_total)
         elif cooling_schedule == AvailableCoolingSchedules.QUADRATIC_ADDAPTIVE:
             return temperature_end + (T0 - temperature) * np.square((steps_total - k) / steps_total)
-        elif cooling_schedule == AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE:            
+        elif cooling_schedule == AvailableCoolingSchedules.EXPONENTIAL_ADDAPTIVE:
             return temperature_end + (T0 - temperature) * (1 / (1 + np.exp((2 * np.log(T0 - temperature_end) / steps_total) * (k - steps_total / 2))))
         elif cooling_schedule == AvailableCoolingSchedules.TRIGONOMETRIC_ADDAPTIVE:
             return temperature_end + (T0 - temperature_end) * (1 + np.cos(k * 3.1415 / steps_total)) / 2
@@ -232,7 +232,7 @@ class SimulatedAnnealingOptimizer(Optimizer):
             current_fitness_value_i = self.current_fitness_value_list[i]
             r = self.random_state.rand()
             p = np.exp((weighted_fitness - current_fitness_value_i) / self.T)
-            
+
             # Accept
             if r < p or weighted_fitness >= current_fitness_value_i:
                 self.current_fitness_value_list[i] = weighted_fitness
