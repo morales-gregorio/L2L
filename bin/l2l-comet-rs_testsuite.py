@@ -58,7 +58,7 @@ def run_experiment():
     predictions_csv = join(results_dir, name, 'target_predictions.csv')
 
     # Calculate target predictions
-    target = sim_model(name='Synthetic target', run_params=sim_params)
+    target = sim_model(name='Synthetic target', run_params=sim_dict)
     print('Calculating the default model predictions.')
     test = test_class()
     target_prediction = test.generate_prediction(target)
