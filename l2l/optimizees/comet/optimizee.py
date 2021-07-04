@@ -42,12 +42,11 @@ class CometOptimizee(Optimizee):
         self.seed = parameters.seed
         self.threads = parameters.threads
         self.keys_to_evolve = parameters.keys_to_evolve
-        self.default_dict = dict()
+        self.default_dict = parameters.default_params_dict
         self.bounds_dict = dict()
         self.shape_dict = dict()
 
         for key in parameters.keys_to_evolve:
-            self.default_dict[key] = parameters.default_params_dict[key]
             self.bounds_dict[key] = parameters.default_bounds_dict[key]
             self.shape_dict[key] = np.array(self.default_dict[key]).shape
 
@@ -135,8 +134,11 @@ class CometOptimizee(Optimizee):
             # Recovers the original size of the paramter array
             key = k.split('individual.')[-1]
             new_params[key] = flat_params.reshape(self.shape_dict[key])
+
+        model_params = self.default_params_dict.copy()
+        model_params.update(new_params)
         observation = self.model_class(name='Optimizee',
-                                       model_params=new_params,
+                                       model_params=model_params,
                                        run_params={'seed': self.seed,
                                                    'total_num_virtual_procs':
                                                        self.threads})
@@ -156,6 +158,6 @@ class CometOptimizee(Optimizee):
         score = test.judge([target, observation],
                            only_lower_triangle=True).iloc[1, 0]
 
-        # The format in which the score is returned is very important
+        # The format in which the score is returned is important
         score = [score.score]
         return (score)
