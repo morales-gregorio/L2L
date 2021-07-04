@@ -9,11 +9,10 @@ from l2l.optimizees.optimizee import Optimizee
 
 CometOptimizeeParameters = \
     namedtuple('CometOptimizeeParameters',
-               ['seed',
-                'threads',
-                'keys_to_evolve',
+               ['keys_to_evolve',
                 'default_params_dict',
                 'default_bounds_dict',
+                'simulation_params',
                 'model_class',
                 'target_class',
                 'target_predictions_csv',
@@ -39,16 +38,15 @@ class CometOptimizee(Optimizee):
     def __init__(self, traj, parameters):
         super().__init__(traj)
 
-        self.seed = parameters.seed
-        self.threads = parameters.threads
         self.keys_to_evolve = parameters.keys_to_evolve
-        self.default_dict = parameters.default_params_dict
+        self.default_params = parameters.default_params_dict
+        self.run_params = parameters.simulation_params
         self.bounds_dict = dict()
         self.shape_dict = dict()
 
         for key in parameters.keys_to_evolve:
             self.bounds_dict[key] = parameters.default_bounds_dict[key]
-            self.shape_dict[key] = np.array(self.default_dict[key]).shape
+            self.shape_dict[key] = np.array(self.default_params[key]).shape
 
         self.model_class = parameters.model_class
         self.target_class = parameters.target_class
@@ -135,13 +133,11 @@ class CometOptimizee(Optimizee):
             key = k.split('individual.')[-1]
             new_params[key] = flat_params.reshape(self.shape_dict[key])
 
-        model_params = self.default_params_dict.copy()
+        model_params = self.default_params.copy()
         model_params.update(new_params)
         observation = self.model_class(name='Optimizee',
                                        model_params=model_params,
-                                       run_params={'seed': self.seed,
-                                                   'total_num_virtual_procs':
-                                                       self.threads})
+                                       run_params=self.run_params)
 
         # Instantiate test
         test = self.test_class()

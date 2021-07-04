@@ -12,6 +12,7 @@ import pandas as pd
 import numpy as np
 import argparse
 from comet.models.brunel.model_params import net_dict, bounds_dict
+from comet.models.brunel.sim_params import sim_dict
 from comet.models.brunel.brunel_model import brunel_model as sim_model
 
 # Optimizee params
@@ -35,6 +36,10 @@ def run_experiment():
 
     # TESTSUITE EXCLUSIVE: reduce model sizes for fast testing
     net_dict['N'] = np.array([100, 25])
+    sim_dict['total_num_virtual_procs'] = optimizee_params['threads']
+    sim_dict['seed'] = optimizee_params['seed']
+    sim_dict['simtime'] = 1000.0
+    sim_dict['transient_time'] = 100.0
 
     # Create experiment class, that deals with jobs and submission
     results_dir = '/users/morales/comet2ltl/results'  # XXX Hard coded
@@ -53,10 +58,7 @@ def run_experiment():
     predictions_csv = join(results_dir, name, 'target_predictions.csv')
 
     # Calculate target predictions
-    target = sim_model(name='Synthetic target',
-                       run_params={'seed': optimizee_params['seed'],
-                                   'total_num_virtual_procs':
-                                       optimizee_params['threads']})
+    target = sim_model(name='Synthetic target', run_params=sim_params)
     print('Calculating the default model predictions.')
     test = test_class()
     target_prediction = test.generate_prediction(target)
@@ -69,11 +71,10 @@ def run_experiment():
 
     # Set up optimizee
     optimizee_parameters = CometOptimizeeParameters(
-        seed=optimizee_params['seed'],
-        threads=optimizee_params['threads'],
         keys_to_evolve=optimizee_params['keys_to_evolve'],
         default_params_dict=net_dict,
         default_bounds_dict=bounds_dict,
+        default_sim_dict=sim_dict,
         model_class=sim_model,
         target_class=sim_model,
         target_predictions_csv=predictions_csv,
