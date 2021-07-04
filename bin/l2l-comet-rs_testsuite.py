@@ -94,7 +94,7 @@ def run_experiment():
                     optimizee_create_individual=optimizee.create_individual,
                     parameters=optimizer_parameters,
                     optimizee_bounding_func=optimizee.bounding_func,
-                    optimizee_fitness_weights=-1)  # minimize
+                    optimizee_fitness_weight=-1)  # minimize
 
     # Add post processing
     experiment.run_experiment(optimizee=optimizee,
