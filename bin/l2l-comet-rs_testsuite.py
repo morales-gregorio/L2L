@@ -27,7 +27,7 @@ optimizer_params = {
     'pop_size': 30,
     'n_iteration': 10,
     'mut_sigma': 0.05,
-    'p_survive': 0.5
+    'p_survival': 0.5
 }
 
 
@@ -86,7 +86,7 @@ def run_experiment():
         pop_size=optimizer_params['pop_size'],
         seed=optimizer_params['seed'],
         n_iteration=optimizer_params['n_iteration'],
-        p_survive=optimizer_params['p_survive'],
+        p_survival=optimizer_params['p_survival'],
         mut_sigma=optimizer_params['mut_sigma'])
 
     optimizer = RandomSearchOptimizer(

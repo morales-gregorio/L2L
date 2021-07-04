@@ -9,13 +9,13 @@ from l2l.optimizers.optimizer import Optimizer
 
 RandomSearchParameters = namedtuple('GeneticAlgorithmParameters',
                                     ['seed', 'pop_size', 'n_iteration',
-                                     'mut_sigma', 'p_survive'])
+                                     'mut_sigma', 'p_survival'])
 RandomSearchParameters.__doc__ = """
 :param seed: Random seed
 :param pop_size: Size of the population
 :param n_iteration: Number of generations simulation should run for
 :param mut_sigma: Standard deviation for the gaussian addition mutation.
-:param p_survive: Percentage of the population that will not be discarded
+:param p_survival: Percentage of the population that will not be discarded
   before the next generation.
 """
 
