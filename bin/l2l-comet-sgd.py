@@ -94,6 +94,8 @@ def run_experiment(args):
     #     stop_criterion=-np.inf,
     #     seed=1234)
 
+    # NOTE: the connection probabilities range between 0.01 and 0.3
+    #       (defined in comet/models/brunel/model_params.py)
     optimizer_parameters = ClassicGDParameters(
         learning_rate=0.01,  #
         exploration_step_size=0.025,  # Step from one iteration to the next (probably absolute, no matter what the parameter ranges are)
