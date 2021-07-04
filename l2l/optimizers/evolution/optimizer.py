@@ -96,9 +96,11 @@ class GeneticAlgorithmOptimizer(Optimizer):
 
         toolbox.register("mate", tools.cxBlend, alpha=parameters.mate_par)
         toolbox.decorate("mate", bounding_decorator)
-        toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=parameters.mut_par, indpb=traj.ind_prob)
+        toolbox.register("mutate", tools.mutGaussian, mu=0,
+                         sigma=parameters.mut_par, indpb=traj.ind_prob)
         toolbox.decorate("mutate", bounding_decorator)
-        toolbox.register("select", tools.selTournament, tournsize=traj.tourn_size)
+        toolbox.register("select", tools.selTournament,
+                         tournsize=traj.tourn_size)
 
         # ------- Initialize Population and Trajectory -------- #
         # NOTE: The Individual object implements the list interface.
