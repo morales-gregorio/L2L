@@ -74,7 +74,7 @@ def run_experiment():
         keys_to_evolve=optimizee_params['keys_to_evolve'],
         default_params_dict=net_dict,
         default_bounds_dict=bounds_dict,
-        default_sim_dict=sim_dict,
+        simulation_params=sim_dict,
         model_class=sim_model,
         target_class=sim_model,
         target_predictions_csv=predictions_csv,
