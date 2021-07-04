@@ -107,7 +107,7 @@ class RandomSearchOptimizer(Optimizer):
         for _ in range(parameters.pop_size):
             ind = simpleIndividual(dict_to_list(self.new_ind()))
             self.pop.append(ind)
-        self.eval_pop_inds = [ind for ind in self.pop if not ind.fitness.valid]
+        self.eval_pop_inds = [ind for ind in self.pop if not ind.fitness]
         self.eval_pop = [list_to_dict(ind, self.ind_dict_spec)
                          for ind in self.eval_pop_inds]
 
