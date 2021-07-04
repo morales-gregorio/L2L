@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 from collections import namedtuple
 from copy import deepcopy
