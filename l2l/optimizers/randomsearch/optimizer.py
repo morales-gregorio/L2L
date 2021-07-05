@@ -60,7 +60,8 @@ class RandomSearchOptimizer(Optimizer):
       The parameters should be initialized based on the values in `parameters`
     :param optimizee_create_individual: Function that creates a new individual
     :param optimizee_fitness_weight: Fitness weight. Used to determine if it is
-      a maximization or minimization problem.
+      a maximization or minimization problem. NOTE: this just takes an integer
+      value for now!
     :param parameters: Instance of :func:`~collections.namedtuple`
       :class:`.RandomSearchOptimizer` containing the parameters
       needed by the Optimizer
