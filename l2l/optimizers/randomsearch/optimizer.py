@@ -161,6 +161,8 @@ class RandomSearchOptimizer(Optimizer):
             print('\nSurvivors are:')
             for ind in self.pop:
                 perc = np.percentile(ind.fitness, gen_fitnesses)
+                print('percentile ', perc)
+                print('surv ', traj.p_survival)
                 survived = False
                 if self.weight > 0:
                     # Maximization case
