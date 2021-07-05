@@ -27,7 +27,7 @@ class simpleIndividual(list):
         self.fitness = None
 
 
-def _mutGaussian(self, individual, mu, sigma):
+def _mutGaussian(individual, mu, sigma):
     """This function applies a gaussian mutation of mean *mu* and standard
     deviation *sigma* on the input individual. This mutation expects a
     :term:`sequence` individual composed of real valued attributes.
@@ -171,7 +171,7 @@ class RandomSearchOptimizer(Optimizer):
             print('\nSurvivors are:')
             for ind in survivors:
                 ind_dict = list_to_dict(ind, self.ind_dict_spec)
-                print("\t%s, %s" % (ind_dict, best_ind.fitness))
+                print("\t%s, %s" % (ind_dict, ind.fitness))
 
             # Mutate all the survivors
             offspring = []
