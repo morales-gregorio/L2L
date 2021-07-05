@@ -45,7 +45,7 @@ def _mutGaussian(individual, mu, sigma):
     sigma = repeat(sigma, size)
 
     mutant = deepcopy(individual)
-    for i, m, s in zip(xrange(size), mu, sigma):
+    for i, m, s in zip(range(size), mu, sigma):
         mutant[i] += random.gauss(m, s)
 
     return mutant
