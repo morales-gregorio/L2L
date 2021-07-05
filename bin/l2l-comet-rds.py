@@ -11,9 +11,6 @@ from os.path import join
 import pandas as pd
 import numpy as np
 import argparse
-from comet.models.brunel.model_params import net_dict, bounds_dict
-from comet.models.brunel.sim_params import sim_dict
-from comet.models.brunel.brunel_model import brunel_model as sim_model
 
 # Optimizee params
 optimizee_params = {
