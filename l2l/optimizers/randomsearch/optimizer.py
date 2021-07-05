@@ -158,26 +158,20 @@ class RandomSearchOptimizer(Optimizer):
         # --Create the next generation by discarding the worst individuals -- #
         if self.g < NGEN - 1:  # not necessary for the last generation
             # Select the best individuals from the current generation
-            survivors = []
+            percentiles = np.argsort(gen_fitnesses) / len(gen_fitnesses)
+            if self.weight > 0:
+                # Maximization case
+                survivor_mask = percentiles > traj.p_survival
+            elif self.weight < 0:
+                # Minimization case
+                survivor_mask = percentiles < traj.p_survival
+            survivors = [ind for ind, survived in zip(self.pop, survivor_mask)
+                         if survived]
+
             print('\nSurvivors are:')
-            for ind in self.pop:
-                perc = np.percentile(ind.fitness, gen_fitnesses)
-                print('percentile ', perc)
-                print('surv ', traj.p_survival)
-                survived = False
-                if self.weight > 0:
-                    # Maximization case
-                    if perc > traj.p_survival:
-                        survivors.append(ind)
-                        survived = True
-                elif self.weight < 0:
-                    # Minimization case
-                    if perc < traj.p_survival:
-                        survivors.append(ind)
-                        survived = True
-                if survived:
-                    ind_dict = list_to_dict(ind, self.ind_dict_spec)
-                    print("\t%s, %s" % (ind_dict, best_ind.fitness))
+            for ind in survivors:
+                ind_dict = list_to_dict(ind, self.ind_dict_spec)
+                print("\t%s, %s" % (ind_dict, best_ind.fitness))
 
             # Mutate all the survivors
             offspring = []
