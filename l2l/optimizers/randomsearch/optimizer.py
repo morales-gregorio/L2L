@@ -33,26 +33,16 @@ def _mutGaussian(individual, mu, sigma):
     :term:`sequence` individual composed of real valued attributes.
 
     :param individual: Individual to be mutated.
-    :param mu: Mean or :term:`python:sequence` of means for the
-               gaussian addition mutation.
-    :param sigma: Standard deviation or :term:`python:sequence` of
-                  standard deviations for the gaussian addition mutation.
-    :returns: One individual
+    :param mu: Mean for the gaussian addition mutation.
+    :param sigma: Standard deviation for the gaussian addition mutation.
+    :returns: A mutated copy of the input individual
 
     This function uses the :func:`~random.random` and :func:`~random.gauss`
     functions from the python base :mod:`random` module.
     """
     size = len(individual)
-    if not isinstance(mu, Sequence):
-        mu = repeat(mu, size)
-    elif len(mu) != size:
-        raise IndexError("mu must have the size of individual: "
-                         "%d != %d" % (len(mu), size))
-    if not isinstance(sigma, Sequence):
-        sigma = repeat(sigma, size)
-    elif len(sigma) != size:
-        raise IndexError("sigma must have the size of individual: "
-                         "%d != %d" % (len(sigma), size))
+    mu = repeat(mu, size)
+    sigma = repeat(sigma, size)
 
     mutant = deepcopy(individual)
     for i, m, s in zip(xrange(size), mu, sigma):
