@@ -99,6 +99,8 @@ class RandomSearchOptimizer(Optimizer):
                              comment='Population size')
         traj.f_add_parameter('n_iteration', parameters.n_iteration,
                              comment='Number of generations')
+        traj.f_add_parameter('mut_sigma', parameters.mut_sigma,
+                             comment='Standard deviation for mutation')
         traj.f_add_parameter('p_survival', parameters.p_survival,
                              comment='Survivor percentage in each generation')
 
@@ -162,12 +164,12 @@ class RandomSearchOptimizer(Optimizer):
                 survived = False
                 if self.weight > 0:
                     # Maximization case
-                    if perc > parameters.p_survival:
+                    if perc > traj.p_survival:
                         survivors.append(ind)
                         survived = True
                 elif self.weight < 0:
                     # Minimization case
-                    if perc < parameters.p_survival:
+                    if perc < traj.p_survival:
                         survivors.append(ind)
                         survived = True
                 if survived:
@@ -177,7 +179,7 @@ class RandomSearchOptimizer(Optimizer):
             # Mutate all the survivors
             offspring = []
             for ind in survivors:
-                mutant = _mutGaussian(ind, mu=0, sigma=parameters.mut_sigma)
+                mutant = _mutGaussian(ind, mu=0, sigma=traj.mut_sigma)
                 del mutant.fitness
                 mutant = self.optimizee_bounding_func(mutant)
                 offspring.append(mutant)
