@@ -37,8 +37,8 @@ def run_experiment(args):
     # Resolve model and noise sources from input arguments
     if args.model == 'brunel':
         if args.noise_type == 'poisson':
-            from comet_brunel_hyperparams import optimizee_params, \
-                optimizer_params
+            # from comet_brunel_hyperparams import optimizee_params, \
+            #     optimizer_params
             from comet.models.brunel.model_params import net_dict, bounds_dict
             from comet.models.brunel.sim_params import sim_dict
             from comet.models.brunel.brunel_model import brunel_model as sim_model
@@ -46,8 +46,8 @@ def run_experiment(args):
             raise NotImplementedError('No pink noise for brunel model')
     elif args.model == 'microcircuit':
         if args.noise_type == 'poisson':
-            from comet_microcircuit_hyperparams import optimizee_params, \
-                optimizer_params
+            # from comet_microcircuit_hyperparams import optimizee_params, \
+            #     optimizer_params
             from comet.models.microcircuit.model_params import net_dict, bounds_dict
             from comet.models.microcircuit.sim_params import sim_dict
             from comet.models.microcircuit.microcircuit_model import microcircuit_model as sim_model
