@@ -146,10 +146,11 @@ class RandomSearchOptimizer(Optimizer):
             individual.fitness = fitness
             gen_fitnesses.append(fitness)
 
+        gen_fitnesses = np.array(gen_fitnesses)
         traj.v_idx = -1  # set the trajectory back to default
 
         print("-- End of generation {} --".format(self.g))
-        best_ind = self.pop[np.argmax(np.array(gen_fitnesses)*self.weight)]
+        best_ind = self.pop[np.argmax(gen_fitnesses*self.weight)]
         self.best_individual = list_to_dict(best_ind, self.ind_dict_spec)
         print('Best individual is:')
         print("\t%s, %s" % (self.best_individual, best_ind.fitness))
