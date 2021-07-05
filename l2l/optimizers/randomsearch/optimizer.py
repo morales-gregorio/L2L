@@ -168,8 +168,9 @@ class RandomSearchOptimizer(Optimizer):
             for ind in survivors:
                 mutant = _mutGaussian(ind, mu=0, sigma=traj.mut_sigma)
                 del mutant.fitness
-                mutant = self.optimizee_bounding_func(mutant)
-                offspring.append(mutant)
+                mutant = self.optimizee_bounding_func(
+                    list_to_dict(mutant, self.ind_dict_spec))
+                offspring.append(dict_to_list(mutant))
 
             # Create new random individuals to replace the dead ones
             for _ in range(len(self.pop) - len(survivors)):
