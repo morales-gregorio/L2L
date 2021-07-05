@@ -61,8 +61,8 @@ def run_experiment(args):
     # Create experiment class, that deals with jobs and submission
     results_dir = '/users/morales/comet2ltl/results'  # XXX Hard coded
     experiment = Experiment(root_dir_path=results_dir)
-    name = 'L2L-COMET-GA-{}-{}'.format(getuser(),
-                                       datetime.now().strftime("%Y-%m-%d-%H_%M"))
+    now = datetime.now().strftime("%Y-%m-%d-%H_%M")
+    name = 'L2L-COMET-RdS-{}-{}'.format(getuser(), now)
     os.mkdir(join(results_dir, name))  # Pre-create the results directory
     trajectory_name = 'comet'
     jube_params = \
