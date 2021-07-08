@@ -10,7 +10,8 @@ from l2l.optimizers.optimizer import Optimizer
 
 RandomSearchParameters = namedtuple('GeneticAlgorithmParameters',
                                     ['seed', 'pop_size', 'n_iteration',
-                                     'mut_sigma', 'p_survival'])
+                                     'mut_sigma', 'p_survival',
+                                     'p_from_best', 'n_best'])
 RandomSearchParameters.__doc__ = """
 :param seed: Random seed
 :param pop_size: Size of the population
@@ -18,6 +19,9 @@ RandomSearchParameters.__doc__ = """
 :param mut_sigma: Standard deviation for the gaussian addition mutation.
 :param p_survival: Percentage of the population that will not be discarded
   before the next generation.
+:param p_from_best: Percentage of the population that will be mutations of the
+  best individuals in the entire optimization.
+:param n_best: number of individuals to keep in the list of best individuals.
 """
 
 
@@ -94,6 +98,10 @@ class RandomSearchOptimizer(Optimizer):
                              comment='Standard deviation for mutation')
         traj.f_add_parameter('p_survival', parameters.p_survival,
                              comment='Survivor percentage in each generation')
+        traj.f_add_parameter('p_from_best', parameters.p_survival,
+                             comment='Portion of generation sampled from best')
+        traj.f_add_parameter('n_best', parameters.p_survival,
+                             comment='Length of list of best individuals')
 
         # ------- Initialize Population and Trajectory -------- #
         # NOTE: The Individual object implements the list interface.
@@ -107,6 +115,8 @@ class RandomSearchOptimizer(Optimizer):
 
         self.g = 0  # current generation
         self.best_individual = None
+        self.best_individuals = None
+        self.best_ind_fitnesses = None
 
         self._expand_trajectory(traj)
 
@@ -146,6 +156,19 @@ class RandomSearchOptimizer(Optimizer):
         print('Best individual is:')
         print("\t%s, %s" % (self.best_individual, best_ind.fitness))
 
+        # Save the best individuals into a list
+        if self.best_individuals is None:
+            b_and_g = self.pop
+            bng_fitnesses = gen_fitnesses
+        else:
+            b_and_g = self.best_individuals + self.pop
+            bng_fitnesses = np.concatenate([self.best_ind_fitnesses,
+                                           gen_fitnesses])
+        best_idx = np.argsort[bng_fitnesses][-self.weight*traj.n_best:]
+        sorting = np.argsort(-self.weight*bng_fitnesses[best_idx])
+        self.best_individuals = [b_and_g[idx] for idx in best_idx[sorting]]
+        self.best_ind_fitnesses = bng_fitnesses[best_idx][sorting]
+
         # --Create the next generation by discarding the worst individuals -- #
         if self.g < NGEN - 1:  # not necessary for the last generation
             # Select the best individuals from the current generation
@@ -163,6 +186,11 @@ class RandomSearchOptimizer(Optimizer):
             for ind in survivors:
                 ind_dict = list_to_dict(ind, self.ind_dict_spec)
                 print("\t%s, %s" % (ind_dict, ind.fitness))
+
+            # Select some individuals out of the best
+            m = int(traj.pop_size * traj.p_from_best)
+            some_of_the_best = np.random.choice(self.best_individuals, m)
+            survivors = survivors + some_of_the_best
 
             # Mutate all the survivors
             offspring = []
