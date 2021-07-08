@@ -166,7 +166,7 @@ class RandomSearchOptimizer(Optimizer):
                                            gen_fitnesses])
         best_idx = np.argsort(bng_fitnesses)[(-self.weight*traj.n_best):]
         best_idx = best_idx.astype(int)
-        sorting = np.argsort(-self.weight*bng_fitnesses[best_idx])
+        sorting = np.argsort(-self.weight*bng_fitnesses[best_idx]).astype(int)
         self.best_individuals = [b_and_g[idx] for idx in best_idx[sorting]]
         self.best_ind_fitnesses = bng_fitnesses[best_idx][sorting]
 
