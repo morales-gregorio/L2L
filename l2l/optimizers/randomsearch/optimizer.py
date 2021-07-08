@@ -198,7 +198,9 @@ class RandomSearchOptimizer(Optimizer):
 
             # Select some individuals out of the best
             m = int(traj.pop_size * traj.p_from_best)
-            some_of_the_best = np.random.choice(self.best_individuals, m)
+            some_of_the_best_idx = np.random.choice(range(traj.n_best), m)
+            some_of_the_best = [self.best_individuals[idx]
+                                for idx in some_of_the_best_idx]
             survivors = survivors + some_of_the_best
 
             # Mutate all the survivors
