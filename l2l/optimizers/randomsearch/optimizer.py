@@ -98,9 +98,9 @@ class RandomSearchOptimizer(Optimizer):
                              comment='Standard deviation for mutation')
         traj.f_add_parameter('p_survival', parameters.p_survival,
                              comment='Survivor percentage in each generation')
-        traj.f_add_parameter('p_from_best', parameters.p_survival,
+        traj.f_add_parameter('p_from_best', parameters.p_from_best,
                              comment='Portion of generation sampled from best')
-        traj.f_add_parameter('n_best', parameters.p_survival,
+        traj.f_add_parameter('n_best', parameters.n_best,
                              comment='Length of list of best individuals')
 
         # ------- Initialize Population and Trajectory -------- #
