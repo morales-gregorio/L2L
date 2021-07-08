@@ -147,7 +147,7 @@ class RandomSearchOptimizer(Optimizer):
             individual.fitness = fitness
             gen_fitnesses.append(fitness)
 
-        gen_fitnesses = np.array(gen_fitnesses)
+        gen_fitnesses = np.array(gen_fitnesses).flatten()
         traj.v_idx = -1  # set the trajectory back to default
 
         print("-- End of generation {} --".format(self.g))
@@ -165,9 +165,9 @@ class RandomSearchOptimizer(Optimizer):
             bng_fitnesses = np.concatenate([self.best_ind_fitnesses,
                                            gen_fitnesses])
         best_idx = np.argsort(bng_fitnesses)[(-self.weight*traj.n_best):]
-        best_idx = best_idx.astype(int).flatten()
+        best_idx = best_idx.astype(int)
         sorting = np.argsort((-self.weight*bng_fitnesses[best_idx]))
-        sorting = sorting.astype(int).flatten()
+        sorting = sorting.astype(int)
         print(b_and_g)
         print(best_idx)
         print(sorting)
