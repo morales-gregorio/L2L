@@ -8,7 +8,7 @@ from itertools import repeat
 from l2l import dict_to_list, list_to_dict
 from l2l.optimizers.optimizer import Optimizer
 
-RandomSearchParameters = namedtuple('GeneticAlgorithmParameters',
+RandomSearchParameters = namedtuple('RandomSearchParameters',
                                     ['seed', 'pop_size', 'n_iteration',
                                      'mut_sigma', 'p_survival',
                                      'p_from_best', 'n_best'])
