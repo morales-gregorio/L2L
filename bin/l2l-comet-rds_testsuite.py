@@ -26,7 +26,7 @@ optimizee_params = {
 optimizer_params = {
     'seed': 1234,
     'pop_size': 30,
-    'n_iteration': 10,
+    'n_iteration': 1000,
     'mut_sigma': 0.05,
     'p_survival': 0.5,
     'p_from_best': 0.2,
@@ -37,7 +37,7 @@ optimizer_params = {
 def run_experiment():
 
     # TESTSUITE EXCLUSIVE: reduce model sizes for fast testing
-    net_dict['N'] = np.array([100, 25])
+    net_dict['N'] = np.array([1000, 250])
     sim_dict['total_num_virtual_procs'] = optimizee_params['threads']
     sim_dict['seed'] = optimizee_params['seed']
     sim_dict['simtime'] = 1000.0
