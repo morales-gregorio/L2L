@@ -153,8 +153,6 @@ class RandomSearchOptimizer(Optimizer):
         print("-- End of generation {} --".format(self.g))
         best_ind = self.pop[np.argmax(gen_fitnesses*self.weight)]
         self.best_individual = list_to_dict(best_ind, self.ind_dict_spec)
-        print('Best individual is:')
-        print("\t%s, %s" % (self.best_individual, best_ind.fitness))
 
         # Save the best individuals into a list
         if self.best_individuals is None:
@@ -170,6 +168,14 @@ class RandomSearchOptimizer(Optimizer):
         sorting = sorting.astype(int)
         self.best_individuals = [b_and_g[idx] for idx in best_idx[sorting]]
         self.best_ind_fitnesses = bng_fitnesses[best_idx][sorting]
+
+        print('\nOverall best individuals are:')
+        for ind in self.best_individuals:
+            ind_dict = list_to_dict(ind, self.ind_dict_spec)
+            print("\t%s, %s" % (ind_dict, ind.fitness))
+
+        print('\nBest individual from generation is:')
+        print("\t%s, %s" % (self.best_individual, best_ind.fitness))
 
         # --Create the next generation by discarding the worst individuals -- #
         if self.g < NGEN - 1:  # not necessary for the last generation
