@@ -30,7 +30,7 @@ optimizer_params = {
     'mut_sigma': 0.05,
     'p_survival': 0.5,
     'p_from_best': 0.2,
-    'n_best': 10
+    'n_best': 20
 }
 
 
