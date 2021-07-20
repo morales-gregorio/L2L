@@ -251,6 +251,11 @@ class RandomSearchOptimizer(Optimizer):
                                 for idx in some_of_the_best_idx]
             survivors = survivors + some_of_the_best
 
+            print('\Selected best individuals are:')
+            for ind in some_of_the_best:
+                ind_dict = list_to_dict(ind, self.ind_dict_spec)
+                print("\t%s, %s" % (ind_dict, ind.fitness))
+
             # Estimate gradient for the survivors
             gen_mask, ind_mask = [], []
             for ind in survivors:
@@ -261,16 +266,19 @@ class RandomSearchOptimizer(Optimizer):
             mask = np.any(gen_mask, axis=0) & np.any(ind_mask, axis=0)
             gradient = self.natural_gradient(df, param_labels, mask=mask)
 
-            print('\nGradient is:')
-            print('\t', gradient)
+            print('\nGradients are:')
+            print(gradient)
 
-            # Mutate all the survivors
+            # Mutate all the survivors, sometimes using the gradient
             offspring = []
-            for i, ind in enumerate(survivors):
+            for j, ind in enumerate(survivors):
+                print(j)
                 if random.random() < traj.p_gradient:
+                    print('using gradient')
                     mutant = _mutGaussian(ind, mu=0, sigma=traj.mut_sigma,
-                                          gradient=gradient[i])
+                                          gradient=gradient[j])
                 else:
+                    print('Random walk')
                     mutant = _mutGaussian(ind, mu=0, sigma=traj.mut_sigma)
                 del mutant.fitness
                 mutant = self.optimizee_bounding_func(
