@@ -8,10 +8,13 @@ from itertools import repeat
 from l2l import dict_to_list, list_to_dict
 from l2l.optimizers.optimizer import Optimizer
 
+from sklearn.neighbors import NearestNeighbors
+
 RandomSearchParameters = namedtuple('RandomSearchParameters',
                                     ['seed', 'pop_size', 'n_iteration',
                                      'mut_sigma', 'p_survival',
-                                     'p_from_best', 'n_best'])
+                                     'p_from_best', 'n_best', 'p_gradient',
+                                     'ind_list_path'])
 RandomSearchParameters.__doc__ = """
 :param seed: Random seed
 :param pop_size: Size of the population
@@ -22,6 +25,9 @@ RandomSearchParameters.__doc__ = """
 :param p_from_best: Percentage of the population that will be mutations of the
   best individuals in the entire optimization.
 :param n_best: number of individuals to keep in the list of best individuals.
+:param p_gradient: probability of a mutation following the gradient descent
+  direction, otherwise a random direction is chosen.
+:param ind_list_path: path to csv file containing all the explored individuals
 """
 
 
@@ -31,7 +37,7 @@ class simpleIndividual(list):
         self.fitness = None
 
 
-def _mutGaussian(individual, mu, sigma):
+def _mutGaussian(individual, mu, sigma, gradient=None):
     """This function applies a gaussian mutation of mean *mu* and standard
     deviation *sigma* on the input individual. This mutation expects a
     :term:`sequence` individual composed of real valued attributes.
@@ -45,12 +51,21 @@ def _mutGaussian(individual, mu, sigma):
     functions from the python base :mod:`random` module.
     """
     size = len(individual)
-    mu = repeat(mu, size)
-    sigma = repeat(sigma, size)
 
+    # Estimate perturbation
+    mag = random.gauss(m, s)
+    if gradient is None:
+        # Create random vector
+        vec = np.array([random.random() for _ in range(size)])
+        vec = mag * vec / np.sqrt(np.sum(vec**2, axis=1))[:, None]
+    else:
+        # Use gradient direction
+        vec = mag * gradient
+
+    # Mutate individual
     mutant = deepcopy(individual)
-    for i, m, s in zip(range(size), mu, sigma):
-        mutant[i] += random.gauss(m, s)
+    for i in range(size):
+        mutant[i] += vec[i]
 
     return mutant
 
@@ -102,6 +117,10 @@ class RandomSearchOptimizer(Optimizer):
                              comment='Portion of generation sampled from best')
         traj.f_add_parameter('n_best', parameters.n_best,
                              comment='Length of list of best individuals')
+        traj.f_add_parameter('p_gradient', parameters.p_gradient,
+                             comment='Probability of using gradient')
+        traj.f_add_parameter('ind_list_path', parameters.ind_list_path,
+                             comment='Path to global indvidual list')
 
         # ------- Initialize Population and Trajectory -------- #
         # NOTE: The Individual object implements the list interface.
@@ -178,6 +197,34 @@ class RandomSearchOptimizer(Optimizer):
         print('\nBest individual from generation is:')
         print("\t%s, %s" % (self.best_individual, best_ind.fitness))
 
+        print('\n--Saving individuals list--\n')
+        # Compile results into a dataframe
+        result = traj.results['all_results']
+        ind_results = []
+        for gen in traj.individuals.keys():
+            if result[gen]:
+                for i, ind in enumerate(traj.individuals[gen]):
+                    res = [gen, ind.ind_idx]
+                    for param in ind.params.keys():
+                        res += list(ind.params[param])
+                    res += result[gen][i][1]  # WS distance
+                    ind_results.append(res)
+        # Resolve the parameter labels
+        labels = ['Generation', 'Individual']
+        param_labels = []
+        for key in ind.params.keys():
+            vals = ind.params[param]
+            if np.size(vals) == 1:
+                param_labels.append(key.split('individual.')[-1])
+            else:
+                newlabels = [key.split('individual.')[-1] + '_' + str(i)
+                             for i in range(len(list(vals)))]
+                param_labels += newlabels
+        labels += param_labels
+        labels.append('Score')
+        df = pd.DataFrame(ind_results, columns=labels)
+        df.to_csv(traj.ind_list_path, index=False)
+
         # --Create the next generation by discarding the worst individuals -- #
         if self.g < NGEN - 1:  # not necessary for the last generation
             # Select the best individuals from the current generation
@@ -203,10 +250,25 @@ class RandomSearchOptimizer(Optimizer):
                                 for idx in some_of_the_best_idx]
             survivors = survivors + some_of_the_best
 
+            # Estimate gradient for the survivors
+            gen_mask, ind_mask = [], []
+            for ind in survivors:
+                gen_mask.append(df['Generation'] == ind.generation)
+                ind_mask.append(df['Individual'] == ind.ind_idx)
+            gen_mask, ind_mask = np.array(gen_mask), np.array(ind_mask)
+            mask = np.any(gen_mask, axis=0) & np.any(ind_mask, axis=0)
+
+            # Get gradient
+            gradient = self.natural_gradient(df, param_labels, mask=mask)
+
             # Mutate all the survivors
             offspring = []
-            for ind in survivors:
-                mutant = _mutGaussian(ind, mu=0, sigma=traj.mut_sigma)
+            for i, ind in enumerate(survivors):
+                if random.random() < traj.p_gradient:
+                    mutant = _mutGaussian(ind, mu=0, sigma=traj.mut_sigma,
+                                          gradient=gradient[i])
+                else:
+                    mutant = _mutGaussian(ind, mu=0, sigma=traj.mut_sigma)
                 del mutant.fitness
                 mutant = self.optimizee_bounding_func(
                     list_to_dict(mutant, self.ind_dict_spec))
@@ -226,6 +288,36 @@ class RandomSearchOptimizer(Optimizer):
 
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
+
+    def natural_gradient(self, df, param_labels, mask=None, N=10):
+        # Get nearest neighbours
+        X = df[param_labels]
+        nbrs = NearestNeighbors(n_neighbors=N, algorithm='ball_tree').fit(X)
+        distances, indices = nbrs.kneighbors(X)
+        if mask:
+            distances, indices = distances[mask], indices[mask]
+
+        # Estimate gradient at each mask point
+        gradients = []
+        for i in range(len(indices)):
+            # Get a ball
+            ball = df.iloc[indices[i]]
+            dist = distances[i]
+            ball_X = ball[param_labels]
+
+            # Estimate the gradient at that point
+            ball_d = (ball_X.iloc[1:] - ball_X.iloc[0]).divide(dist[1:],
+                                                               axis='rows')
+            w = ball['Score'].iloc[1:] - ball['Score'].iloc[0]
+            g = ball_d.multiply(w, axis='rows').sum(axis='rows') / N
+            gradients.append(g)
+
+        G = np.stack(gradients)
+
+        # Normalization and direction
+        nG = self.weight * G / np.sqrt(np.sum(G**2, axis=1))[:, None]
+
+        return nG
 
     def end(self, traj):
         """
