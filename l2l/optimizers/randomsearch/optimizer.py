@@ -257,14 +257,13 @@ class RandomSearchOptimizer(Optimizer):
                 print("\t%s, %s" % (ind_dict, ind.fitness))
 
             # Estimate gradient for the survivors
-            gen_mask, ind_mask = [], []
+            ind_mask = []
             for ind in survivors:
                 close_params = np.isclose(df[param_labels], ind)
                 ind_mask.append(np.all(close_params, axis=1))
-                gen_mask.append(df['Generation'] == self.g)
-            gen_mask, ind_mask = np.array(gen_mask), np.array(ind_mask)
-            mask = np.any(gen_mask, axis=0) & np.any(ind_mask, axis=0)
-            gradient = self.natural_gradient(df, param_labels, mask=mask)
+            ind_mask =  np.array(ind_mask)
+            idx_arr = np.where(ind_mask)[-1]
+            gradient = self.natural_gradient(df, param_labels, idx=idx_arr)
 
             print('\nGradients are:')
             print(gradient)
@@ -300,13 +299,13 @@ class RandomSearchOptimizer(Optimizer):
             self.g += 1  # Update generation counter
             self._expand_trajectory(traj)
 
-    def natural_gradient(self, df, param_labels, mask=None, N=10):
+    def natural_gradient(self, df, param_labels, idx=None, N=10):
         # Get nearest neighbours
         X = df[param_labels]
         nbrs = NearestNeighbors(n_neighbors=N, algorithm='ball_tree').fit(X)
         distances, indices = nbrs.kneighbors(X)
-        if mask is not None:
-            distances, indices = distances[mask], indices[mask]
+        if idx is not None:
+            distances, indices = distances[idx], indices[idx]
 
         # Estimate gradient at each mask point
         gradients = []
