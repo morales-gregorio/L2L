@@ -54,7 +54,7 @@ def _mutGaussian(individual, mu, sigma, gradient=None):
     size = len(individual)
 
     # Estimate perturbation
-    mag = random.gauss(m, s)
+    mag = random.gauss(mu, sigma)
     if gradient is None:
         # Create random vector
         vec = np.array([random.random() for _ in range(size)])
