@@ -256,8 +256,13 @@ class RandomSearchOptimizer(Optimizer):
             for ind in survivors:
                 close_params = np.isclose(df[param_labels], ind)
                 ind_mask.append(np.all(close_params, axis=1))
-            ind_mask = np.any(np.array(ind_mask), axis=0)
-            gradient = self.natural_gradient(df, param_labels, mask=ind_mask)
+                gen_mask.append(df['Generation'] == self.g)
+            gen_mask, ind_mask = np.array(gen_mask), np.array(ind_mask)
+            mask = np.any(gen_mask, axis=0) & np.any(ind_mask, axis=0)
+            gradient = self.natural_gradient(df, param_labels, mask=mask)
+
+            print('\nGradient is:')
+            print('\t', gradient)
 
             # Mutate all the survivors
             offspring = []
