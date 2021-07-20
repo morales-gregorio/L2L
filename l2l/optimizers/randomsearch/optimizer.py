@@ -252,15 +252,12 @@ class RandomSearchOptimizer(Optimizer):
             survivors = survivors + some_of_the_best
 
             # Estimate gradient for the survivors
-            gen_mask, ind_mask = [], []
+            ind_mask = []
             for ind in survivors:
-                gen_mask.append(df['Generation'] == ind.generation)
-                ind_mask.append(df['Individual'] == ind.ind_idx)
-            gen_mask, ind_mask = np.array(gen_mask), np.array(ind_mask)
-            mask = np.any(gen_mask, axis=0) & np.any(ind_mask, axis=0)
-
-            # Get gradient
-            gradient = self.natural_gradient(df, param_labels, mask=mask)
+                close_params = np.isclose(df[param_labels], ind)
+                ind_mask.append(np.all(close_params, axis=1))
+            ind_mask = np.any(np.array(ind_mask), axis=0)
+            gradient = self.natural_gradient(df, param_labels, mask=ind_mask)
 
             # Mutate all the survivors
             offspring = []
