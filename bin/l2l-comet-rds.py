@@ -27,7 +27,8 @@ optimizer_params = {
     'mut_sigma': 0.01,
     'p_survival': 0.5,
     'p_from_best': 0.1,
-    'n_best': 20
+    'n_best': 20,
+    'p_gradient': 0.5
 }
 
 
@@ -72,6 +73,7 @@ def run_experiment(args):
 
     # Create target predictions (either synthetic data or experimental)
     predictions_csv = join(results_dir, name, 'target_predictions.csv')
+    ind_list_path = join(results_dir, name, 'global_ind_list.csv')
     if args.mode == 'syn':
         # Calculate target predictions
         target = sim_model(name='Synthetic target', run_params=sim_dict)
@@ -109,7 +111,9 @@ def run_experiment(args):
         p_survival=optimizer_params['p_survival'],
         mut_sigma=optimizer_params['mut_sigma'],
         p_from_best=optimizer_params['p_from_best'],
-        n_best=optimizer_params['n_best'])
+        n_best=optimizer_params['n_best'],
+        p_gradient=optimizer_params['p_gradient'],
+        ind_list_path=ind_list_path)
 
     optimizer = RandomSearchOptimizer(
                     traj,
