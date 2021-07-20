@@ -251,7 +251,7 @@ class RandomSearchOptimizer(Optimizer):
                                 for idx in some_of_the_best_idx]
             survivors = survivors + some_of_the_best
 
-            print('\Selected best individuals are:')
+            print('\mSelected best individuals are:')
             for ind in some_of_the_best:
                 ind_dict = list_to_dict(ind, self.ind_dict_spec)
                 print("\t%s, %s" % (ind_dict, ind.fitness))
@@ -271,13 +271,10 @@ class RandomSearchOptimizer(Optimizer):
             # Mutate all the survivors, sometimes using the gradient
             offspring = []
             for j, ind in enumerate(survivors):
-                print(j)
                 if random.random() < traj.p_gradient:
-                    print('using gradient')
                     mutant = _mutGaussian(ind, mu=0, sigma=traj.mut_sigma,
                                           gradient=gradient[j])
                 else:
-                    print('Random walk')
                     mutant = _mutGaussian(ind, mu=0, sigma=traj.mut_sigma)
                 del mutant.fitness
                 mutant = self.optimizee_bounding_func(
@@ -305,6 +302,7 @@ class RandomSearchOptimizer(Optimizer):
         nbrs = NearestNeighbors(n_neighbors=N, algorithm='ball_tree').fit(X)
         distances, indices = nbrs.kneighbors(X)
         if idx is not None:
+            # Indices used, not masks, because the individuals can be repeated
             distances, indices = distances[idx], indices[idx]
 
         # Estimate gradient at each mask point
