@@ -252,7 +252,7 @@ class RandomSearchOptimizer(Optimizer):
             survivors = survivors + some_of_the_best
 
             # Estimate gradient for the survivors
-            ind_mask = []
+            gen_mask, ind_mask = [], []
             for ind in survivors:
                 close_params = np.isclose(df[param_labels], ind)
                 ind_mask.append(np.all(close_params, axis=1))
