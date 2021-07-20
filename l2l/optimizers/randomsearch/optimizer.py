@@ -292,7 +292,7 @@ class RandomSearchOptimizer(Optimizer):
         X = df[param_labels]
         nbrs = NearestNeighbors(n_neighbors=N, algorithm='ball_tree').fit(X)
         distances, indices = nbrs.kneighbors(X)
-        if mask:
+        if mask is not None:
             distances, indices = distances[mask], indices[mask]
 
         # Estimate gradient at each mask point
