@@ -58,7 +58,7 @@ def _mutGaussian(individual, mu, sigma, gradient=None):
     if gradient is None:
         # Create random vector
         vec = np.array([random.random() for _ in range(size)])
-        vec = mag * vec / np.sqrt(np.sum(vec**2, axis=1))[:, None]
+        vec = mag * vec / np.sqrt(np.sum(vec**2))
     else:
         # Use gradient direction
         vec = mag * gradient
